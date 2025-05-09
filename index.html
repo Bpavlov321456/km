@@ -3,7 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Автомобилен помощник - сервиз и документи</title>
+    <title>Автомобилен помощник - сервиз и документи за вашето МПС</title>
+    <meta name="description" content="Лесно проследяване на сервизни интервали, винетки, прегледи, гражданска отговорност и ремонти за вашите превозни средства">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yourwebsite.com/">
+    <meta property="og:title" content="Автомобилен помощник - сервиз и документи">
+    <meta property="og:description" content="Проследявайте сервизните интервали, документи и ремонти за вашето МПС">
+    <meta property="og:image" content="https://yourwebsite.com/image.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://yourwebsite.com/">
+    <meta property="twitter:title" content="Автомобилен помощник - сервиз и документи">
+    <meta property="twitter:description" content="Проследявайте сервизните интервали, документи и ремонти за вашето МПС">
+    <meta property="twitter:image" content="https://yourwebsite.com/image.jpg">
+
     <style>
         :root {
             --primary: #2c3e50;
@@ -14,6 +30,7 @@
             --light: #ecf0f1;
             --dark: #2c3e50;
             --info: #17a2b8;
+            --repair: #8e44ad;
         }
         
         * {
@@ -69,7 +86,7 @@
             font-size: 0.9rem;
         }
         
-        input, select {
+        input, select, textarea {
             width: 100%;
             padding: 8px;
             border: 1px solid #ddd;
@@ -110,6 +127,10 @@
             background: var(--info);
         }
         
+        .btn-repair {
+            background: var(--repair);
+        }
+        
         .alert {
             padding: 10px;
             border-radius: 4px;
@@ -135,6 +156,11 @@
         .alert-info {
             background: #d1ecf1;
             border-left: 4px solid var(--info);
+        }
+        
+        .alert-repair {
+            background: #e8d6f2;
+            border-left: 4px solid var(--repair);
         }
         
         .status-box {
@@ -188,6 +214,10 @@
         
         .insurance-badge {
             background: #6f42c1;
+        }
+        
+        .repair-badge {
+            background: var(--repair);
         }
         
         .vehicles-list {
@@ -261,13 +291,13 @@
             vertical-align: middle;
         }
         
-        .documents-section {
+        .documents-section, .repairs-section {
             margin-top: 12px;
             padding-top: 12px;
             border-top: 1px solid #eee;
         }
         
-        .document-item {
+        .document-item, .repair-item {
             margin-bottom: 8px;
             padding: 6px;
             background: #f8f9fa;
@@ -275,10 +305,21 @@
             font-size: 0.9rem;
         }
         
+        .repair-item.completed {
+            opacity: 0.7;
+            background: #e8f5e9;
+        }
+        
         .date-range {
             font-size: 0.8rem;
             color: #666;
             margin-top: 2px;
+        }
+        
+        .repair-description {
+            margin-top: 5px;
+            font-size: 0.8rem;
+            color: #555;
         }
         
         @media (min-width: 768px) {
@@ -318,28 +359,28 @@
     <div class="container">
         <header>
             <h1>Автомобилен помощник</h1>
-            <p style="font-size: 0.9rem;">Проследяване на сервизни интервали и документи</p>
+            <p style="font-size: 0.9rem;">Проследяване на сервизни интервали, документи и ремонти за вашето МПС</p>
         </header>
         
         <div class="tab-buttons">
-            <button class="tab-btn active" onclick="openTab('manage')">Вашите коли</button>
-            <button class="tab-btn" onclick="openTab('add')">Добави ново ППС</button>
+            <button class="tab-btn active" onclick="openTab('manage')">Вашите МПС</button>
+            <button class="tab-btn" onclick="openTab('add')">Добави ново МПС</button>
         </div>
         
         <div id="manage" class="tab-content active">
             <div class="card">
                 <h2 style="font-size: 1.2rem; margin-bottom: 10px;">Вашите превозни средства</h2>
                 <div id="vehiclesContainer" class="vehicles-list">
-                    <!-- Колите ще се показват тук -->
+                    <!-- МПС-тата ще се показват тук -->
                 </div>
             </div>
         </div>
         
         <div id="add" class="tab-content">
             <div class="card">
-                <h2 style="font-size: 1.2rem; margin-bottom: 10px;">Добавяне на ново превозно средство</h2>
+                <h2 style="font-size: 1.2rem; margin-bottom: 10px;">Добавяне на ново МПС</h2>
                 <div class="form-group">
-                    <label for="vehicleType">Тип превозно средство</label>
+                    <label for="vehicleType">Тип МПС</label>
                     <select id="vehicleType" class="form-control">
                         <option value="car">Лека кола</option>
                         <option value="truck">Камион</option>
@@ -356,6 +397,10 @@
                     <input type="text" id="vehicleModel" placeholder="Например: Golf">
                 </div>
                 <div class="form-group">
+                    <label for="licensePlate">Регистрационен номер</label>
+                    <input type="text" id="licensePlate" placeholder="Например: СА1234ВС">
+                </div>
+                <div class="form-group">
                     <label for="serviceInterval">Сервизен интервал (км)</label>
                     <input type="number" id="serviceInterval" placeholder="Например: 10000">
                 </div>
@@ -369,20 +414,62 @@
                 </div>
                 
                 <h3 style="margin-top: 15px; font-size: 1.1rem;">Документи (по избор)</h3>
+                
                 <div class="form-group">
-                    <label for="vignetteDate">Винетка от дата</label>
-                    <input type="date" id="vignetteDate">
+                    <label for="vignetteStartDate">Винетка - начална дата</label>
+                    <input type="date" id="vignetteStartDate">
                 </div>
                 <div class="form-group">
-                    <label for="inspectionDate">Преглед от дата</label>
-                    <input type="date" id="inspectionDate">
-                </div>
-                <div class="form-group">
-                    <label for="insuranceDate">Гражданска от дата</label>
-                    <input type="date" id="insuranceDate">
+                    <label for="vignetteEndDate">Винетка - крайна дата</label>
+                    <input type="date" id="vignetteEndDate">
                 </div>
                 
-                <button id="addVehicleBtn" class="btn-success">Добави превозно средство</button>
+                <div class="form-group">
+                    <label for="inspectionStartDate">Преглед - начална дата</label>
+                    <input type="date" id="inspectionStartDate">
+                </div>
+                <div class="form-group">
+                    <label for="inspectionEndDate">Преглед - крайна дата</label>
+                    <input type="date" id="inspectionEndDate">
+                </div>
+                
+                <div class="form-group">
+                    <label for="insuranceStartDate">Гражданска - начална дата</label>
+                    <input type="date" id="insuranceStartDate">
+                </div>
+                <div class="form-group">
+                    <label for="insuranceEndDate">Гражданска - крайна дата</label>
+                    <input type="date" id="insuranceEndDate">
+                </div>
+                
+                <button id="addVehicleBtn" class="btn-success">Добави МПС</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for adding/editing repairs -->
+    <div id="repairModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+        <div style="background: white; padding: 20px; border-radius: 8px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto;">
+            <h3 id="repairModalTitle" style="margin-bottom: 15px;">Добавяне на ремонт</h3>
+            <div class="form-group">
+                <label for="repairDescription">Описание на ремонта</label>
+                <textarea id="repairDescription" rows="3" placeholder="Например: Смяна на спирачни накладки"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="repairDate">Дата (ако е направен)</label>
+                <input type="date" id="repairDate">
+            </div>
+            <div class="form-group">
+                <label for="repairMileage">Километраж (ако е направен)</label>
+                <input type="number" id="repairMileage" placeholder="Километраж при ремонта">
+            </div>
+            <div class="form-group">
+                <label for="repairCost">Цена (лв)</label>
+                <input type="number" id="repairCost" placeholder="Например: 250">
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button id="saveRepairBtn" class="btn-success">Запази</button>
+                <button onclick="closeRepairModal()" class="btn-danger">Откажи</button>
             </div>
         </div>
     </div>
@@ -391,6 +478,13 @@
         // DOM Elements
         const vehiclesContainer = document.getElementById('vehiclesContainer');
         const addVehicleBtn = document.getElementById('addVehicleBtn');
+        const repairModal = document.getElementById('repairModal');
+        const saveRepairBtn = document.getElementById('saveRepairBtn');
+        
+        // Global variables
+        let currentVehicleIndex = null;
+        let currentRepairIndex = null;
+        let isEditingRepair = false;
         
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
@@ -398,6 +492,7 @@
             
             // Set up event listeners
             addVehicleBtn.addEventListener('click', addNewVehicle);
+            saveRepairBtn.addEventListener('click', saveRepair);
         });
         
         // Tab navigation
@@ -424,12 +519,13 @@
             return date.toLocaleDateString('bg-BG');
         }
         
-        // Calculate end date (1 year later)
-        function calculateEndDate(startDate) {
-            if (!startDate) return '';
-            const date = new Date(startDate);
-            date.setFullYear(date.getFullYear() + 1);
-            return date;
+        // Calculate days left until date
+        function calculateDaysLeft(endDate) {
+            if (!endDate) return Infinity;
+            const end = new Date(endDate);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return Math.ceil((end - today) / (1000 * 60 * 60 * 24));
         }
         
         // Load all vehicles
@@ -437,7 +533,7 @@
             const vehicles = JSON.parse(localStorage.getItem('vehicles')) || [];
             
             if (vehicles.length === 0) {
-                vehiclesContainer.innerHTML = '<p style="text-align: center;">Нямате добавени превозни средства. Моля, добавете първото.</p>';
+                vehiclesContainer.innerHTML = '<p style="text-align: center;">Нямате добавени МПС. Моля, добавете първото.</p>';
                 return;
             }
             
@@ -452,7 +548,7 @@
                     case 'car': typeText = 'Лека кола'; break;
                     case 'truck': typeText = 'Камион'; break;
                     case 'motorcycle': typeText = 'Мотор'; break;
-                    default: typeText = 'Превозно средство';
+                    default: typeText = 'МПС';
                 }
                 
                 // Calculate service status
@@ -485,9 +581,9 @@
                 // Documents section
                 let documentsHTML = '';
                 
-                if (vehicle.vignetteDate) {
-                    const vignetteEnd = calculateEndDate(vehicle.vignetteDate);
-                    const daysLeft = Math.ceil((vignetteEnd - new Date()) / (1000 * 60 * 60 * 24));
+                // Vignette
+                if (vehicle.vignetteStartDate && vehicle.vignetteEndDate) {
+                    const daysLeft = calculateDaysLeft(vehicle.vignetteEndDate);
                     
                     let vignetteStatus = '';
                     if (daysLeft <= 0) {
@@ -495,22 +591,22 @@
                     } else if (daysLeft <= 30) {
                         vignetteStatus = `<span class="warning">Изтича след ${daysLeft} дни!</span>`;
                     } else {
-                        vignetteStatus = `Валидна до: ${formatDate(vignetteEnd)}`;
+                        vignetteStatus = `Валидна до: ${formatDate(vehicle.vignetteEndDate)}`;
                     }
                     
                     documentsHTML += `
                         <div class="document-item">
                             <strong><span class="badge vignette-badge">Винетка</span></strong>
-                            <div>${formatDate(vehicle.vignetteDate)} - ${formatDate(vignetteEnd)}</div>
+                            <div>${formatDate(vehicle.vignetteStartDate)} - ${formatDate(vehicle.vignetteEndDate)}</div>
                             <div>${vignetteStatus}</div>
-                            <button class="btn-info" style="margin-top: 5px;" onclick="updateDocumentDate(${index}, 'vignette')">Обнови</button>
+                            <button class="btn-info" style="margin-top: 5px;" onclick="updateDocumentDates(${index}, 'vignette')">Обнови</button>
                         </div>
                     `;
                 }
                 
-                if (vehicle.inspectionDate) {
-                    const inspectionEnd = calculateEndDate(vehicle.inspectionDate);
-                    const daysLeft = Math.ceil((inspectionEnd - new Date()) / (1000 * 60 * 60 * 24));
+                // Inspection
+                if (vehicle.inspectionStartDate && vehicle.inspectionEndDate) {
+                    const daysLeft = calculateDaysLeft(vehicle.inspectionEndDate);
                     
                     let inspectionStatus = '';
                     if (daysLeft <= 0) {
@@ -518,22 +614,22 @@
                     } else if (daysLeft <= 30) {
                         inspectionStatus = `<span class="warning">Изтича след ${daysLeft} дни!</span>`;
                     } else {
-                        inspectionStatus = `Валиден до: ${formatDate(inspectionEnd)}`;
+                        inspectionStatus = `Валиден до: ${formatDate(vehicle.inspectionEndDate)}`;
                     }
                     
                     documentsHTML += `
                         <div class="document-item">
                             <strong><span class="badge inspection-badge">Преглед</span></strong>
-                            <div>${formatDate(vehicle.inspectionDate)} - ${formatDate(inspectionEnd)}</div>
+                            <div>${formatDate(vehicle.inspectionStartDate)} - ${formatDate(vehicle.inspectionEndDate)}</div>
                             <div>${inspectionStatus}</div>
-                            <button class="btn-info" style="margin-top: 5px;" onclick="updateDocumentDate(${index}, 'inspection')">Обнови</button>
+                            <button class="btn-info" style="margin-top: 5px;" onclick="updateDocumentDates(${index}, 'inspection')">Обнови</button>
                         </div>
                     `;
                 }
                 
-                if (vehicle.insuranceDate) {
-                    const insuranceEnd = calculateEndDate(vehicle.insuranceDate);
-                    const daysLeft = Math.ceil((insuranceEnd - new Date()) / (1000 * 60 * 60 * 24));
+                // Insurance
+                if (vehicle.insuranceStartDate && vehicle.insuranceEndDate) {
+                    const daysLeft = calculateDaysLeft(vehicle.insuranceEndDate);
                     
                     let insuranceStatus = '';
                     if (daysLeft <= 0) {
@@ -541,22 +637,78 @@
                     } else if (daysLeft <= 30) {
                         insuranceStatus = `<span class="warning">Изтича след ${daysLeft} дни!</span>`;
                     } else {
-                        insuranceStatus = `Валидна до: ${formatDate(insuranceEnd)}`;
+                        insuranceStatus = `Валидна до: ${formatDate(vehicle.insuranceEndDate)}`;
                     }
                     
                     documentsHTML += `
                         <div class="document-item">
                             <strong><span class="badge insurance-badge">Гражданска</span></strong>
-                            <div>${formatDate(vehicle.insuranceDate)} - ${formatDate(insuranceEnd)}</div>
+                            <div>${formatDate(vehicle.insuranceStartDate)} - ${formatDate(vehicle.insuranceEndDate)}</div>
                             <div>${insuranceStatus}</div>
-                            <button class="btn-info" style="margin-top: 5px;" onclick="updateDocumentDate(${index}, 'insurance')">Обнови</button>
+                            <button class="btn-info" style="margin-top: 5px;" onclick="updateDocumentDates(${index}, 'insurance')">Обнови</button>
                         </div>
                     `;
+                }
+                
+                // Repairs section
+                let repairsHTML = '';
+                if (vehicle.repairs && vehicle.repairs.length > 0) {
+                    // Separate completed and pending repairs
+                    const pendingRepairs = vehicle.repairs.filter(r => !r.completed);
+                    const completedRepairs = vehicle.repairs.filter(r => r.completed);
+                    
+                    if (pendingRepairs.length > 0) {
+                        repairsHTML += `<h4 style="font-size: 1rem; margin-bottom: 8px; color: var(--danger);">Предстоящи ремонти</h4>`;
+                        pendingRepairs.forEach((repair, repairIndex) => {
+                            repairsHTML += `
+                                <div class="repair-item">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <strong><span class="badge repair-badge">Ремонт</span></strong>
+                                        <div>
+                                            <button class="btn-success" style="padding: 2px 5px; font-size: 0.8rem;" onclick="completeRepair(${index}, ${repairIndex})">Завършен</button>
+                                            <button class="btn-info" style="padding: 2px 5px; font-size: 0.8rem;" onclick="editRepair(${index}, ${repairIndex})">Редактирай</button>
+                                            <button class="btn-danger" style="padding: 2px 5px; font-size: 0.8rem;" onclick="deleteRepair(${index}, ${repairIndex})">Изтрий</button>
+                                        </div>
+                                    </div>
+                                    <div class="repair-description">${repair.description}</div>
+                                    ${repair.cost ? `<div>Цена: ${repair.cost} лв</div>` : ''}
+                                </div>
+                            `;
+                        });
+                    }
+                    
+                    if (completedRepairs.length > 0) {
+                        repairsHTML += `<h4 style="font-size: 1rem; margin-bottom: 8px; margin-top: ${pendingRepairs.length > 0 ? '15px' : '0'}; color: var(--success);">Извършени ремонти</h4>`;
+                        completedRepairs.forEach((repair, repairIndex) => {
+                            const originalIndex = vehicle.repairs.findIndex(r => 
+                                r.description === repair.description && 
+                                r.date === repair.date && 
+                                r.completed === true
+                            );
+                            
+                            repairsHTML += `
+                                <div class="repair-item completed">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <strong><span class="badge repair-badge">Завършен</span></strong>
+                                        <div>
+                                            <button class="btn-info" style="padding: 2px 5px; font-size: 0.8rem;" onclick="editRepair(${index}, ${originalIndex})">Редактирай</button>
+                                            <button class="btn-danger" style="padding: 2px 5px; font-size: 0.8rem;" onclick="deleteRepair(${index}, ${originalIndex})">Изтрий</button>
+                                        </div>
+                                    </div>
+                                    <div class="repair-description">${repair.description}</div>
+                                    ${repair.date ? `<div>Дата: ${formatDate(repair.date)}</div>` : ''}
+                                    ${repair.mileage ? `<div>Километраж: ${repair.mileage} км</div>` : ''}
+                                    ${repair.cost ? `<div>Цена: ${repair.cost} лв</div>` : ''}
+                                </div>
+                            `;
+                        });
+                    }
                 }
                 
                 vehicleCard.innerHTML = `
                     <h3>${vehicle.brand} ${vehicle.model}</h3>
                     <p><strong>Тип:</strong> ${typeText}</p>
+                    ${vehicle.licensePlate ? `<p><strong>Рег. номер:</strong> ${vehicle.licensePlate}</p>` : ''}
                     <p><strong>Километраж:</strong> ${currentMileage} км</p>
                     <p><strong>Последна смяна:</strong> ${lastService} км</p>
                     
@@ -571,10 +723,13 @@
                     
                     ${documentsHTML ? `<div class="documents-section"><h4 style="font-size: 1rem; margin-bottom: 8px;">Документи</h4>${documentsHTML}</div>` : ''}
                     
+                    ${repairsHTML ? `<div class="repairs-section">${repairsHTML}</div>` : ''}
+                    
                     <div class="vehicle-actions">
                         <button class="btn-warning" onclick="openUpdateMileageForm(${index})">Километраж</button>
                         <button class="btn-success" onclick="recordService(${index})">Смяна</button>
-                        <button class="btn-danger" onclick="deleteVehicle(${index})">Изтрий</button>
+                        <button class="btn-repair" onclick="addNewRepair(${index})">Добави ремонт</button>
+                        <button class="btn-danger" onclick="deleteVehicle(${index})">Изтрий МПС</button>
                     </div>
                     
                     <div id="updateForm-${index}" style="display: none; margin-top: 10px;">
@@ -586,9 +741,16 @@
                     </div>
                     
                     <div id="updateDocForm-${index}" style="display: none; margin-top: 10px;">
-                        <input type="date" id="newDocDate-${index}" style="margin-bottom: 8px; width: 100%;">
+                        <div class="form-group">
+                            <label for="newDocStartDate-${index}">Начална дата</label>
+                            <input type="date" id="newDocStartDate-${index}" style="margin-bottom: 8px; width: 100%;">
+                        </div>
+                        <div class="form-group">
+                            <label for="newDocEndDate-${index}">Крайна дата</label>
+                            <input type="date" id="newDocEndDate-${index}" style="margin-bottom: 8px; width: 100%;">
+                        </div>
                         <div style="display: flex; gap: 5px;">
-                            <button onclick="saveDocumentDate(${index})">Запази</button>
+                            <button onclick="saveDocumentDates(${index})">Запази</button>
                             <button class="btn-danger" onclick="closeDocForm(${index})">Откажи</button>
                         </div>
                     </div>
@@ -603,12 +765,18 @@
             const type = document.getElementById('vehicleType').value;
             const brand = document.getElementById('vehicleBrand').value.trim();
             const model = document.getElementById('vehicleModel').value.trim();
+            const licensePlate = document.getElementById('licensePlate').value.trim();
             const interval = parseInt(document.getElementById('serviceInterval').value);
             const notifyKm = parseInt(document.getElementById('notificationKm').value) || 0;
             const initialMileage = parseInt(document.getElementById('initialMileage').value);
-            const vignetteDate = document.getElementById('vignetteDate').value;
-            const inspectionDate = document.getElementById('inspectionDate').value;
-            const insuranceDate = document.getElementById('insuranceDate').value;
+            
+            // Document dates
+            const vignetteStartDate = document.getElementById('vignetteStartDate').value;
+            const vignetteEndDate = document.getElementById('vignetteEndDate').value;
+            const inspectionStartDate = document.getElementById('inspectionStartDate').value;
+            const inspectionEndDate = document.getElementById('inspectionEndDate').value;
+            const insuranceStartDate = document.getElementById('insuranceStartDate').value;
+            const insuranceEndDate = document.getElementById('insuranceEndDate').value;
             
             // Validation
             if (!brand || !model) {
@@ -626,24 +794,53 @@
                 return;
             }
             
+            // Validate document dates
+            if ((vignetteStartDate && !vignetteEndDate) || (!vignetteStartDate && vignetteEndDate)) {
+                showAlert('Моля, въведете и двете дати за винетката или оставете и двете празни!', 'danger');
+                return;
+            }
+            
+            if ((inspectionStartDate && !inspectionEndDate) || (!inspectionStartDate && inspectionEndDate)) {
+                showAlert('Моля, въведете и двете дати за прегледа или оставете и двете празни!', 'danger');
+                return;
+            }
+            
+            if ((insuranceStartDate && !insuranceEndDate) || (!insuranceStartDate && insuranceEndDate)) {
+                showAlert('Моля, въведете и двете дати за гражданската или оставете и двете празни!', 'danger');
+                return;
+            }
+            
             const vehicles = JSON.parse(localStorage.getItem('vehicles')) || [];
             
             const newVehicle = {
                 type: type,
                 brand: brand,
                 model: model,
+                licensePlate: licensePlate,
                 serviceInterval: interval,
                 notificationKm: notifyKm,
                 initialMileage: initialMileage,
                 currentMileage: initialMileage,
                 lastServiceMileage: initialMileage,
-                history: []
+                history: [],
+                repairs: []
             };
             
             // Add documents if provided
-            if (vignetteDate) newVehicle.vignetteDate = vignetteDate;
-            if (inspectionDate) newVehicle.inspectionDate = inspectionDate;
-            if (insuranceDate) newVehicle.insuranceDate = insuranceDate;
+            if (vignetteStartDate && vignetteEndDate) {
+                newVehicle.vignetteStartDate = vignetteStartDate;
+                newVehicle.vignetteEndDate = vignetteEndDate;
+            }
+            
+            if (inspectionStartDate && inspectionEndDate) {
+                newVehicle.inspectionStartDate = inspectionStartDate;
+                newVehicle.inspectionEndDate = inspectionEndDate;
+            }
+            
+            if (insuranceStartDate && insuranceEndDate) {
+                newVehicle.insuranceStartDate = insuranceStartDate;
+                newVehicle.insuranceEndDate = insuranceEndDate;
+            }
             
             vehicles.push(newVehicle);
             
@@ -652,37 +849,68 @@
             // Clear form
             document.getElementById('vehicleBrand').value = '';
             document.getElementById('vehicleModel').value = '';
+            document.getElementById('licensePlate').value = '';
             document.getElementById('serviceInterval').value = '';
             document.getElementById('notificationKm').value = '';
             document.getElementById('initialMileage').value = '';
-            document.getElementById('vignetteDate').value = '';
-            document.getElementById('inspectionDate').value = '';
-            document.getElementById('insuranceDate').value = '';
+            document.getElementById('vignetteStartDate').value = '';
+            document.getElementById('vignetteEndDate').value = '';
+            document.getElementById('inspectionStartDate').value = '';
+            document.getElementById('inspectionEndDate').value = '';
+            document.getElementById('insuranceStartDate').value = '';
+            document.getElementById('insuranceEndDate').value = '';
             
-            showAlert('Превозното средство е добавено успешно!', 'success');
+            showAlert('МПС-то е добавено успешно!', 'success');
             loadVehicles();
             openTab('manage');
         }
         
-        // Open update document form
-        function updateDocumentDate(index, docType) {
+        // Open update document dates form
+        function updateDocumentDates(index, docType) {
             const formId = `updateDocForm-${index}`;
             const currentForm = document.getElementById(formId);
             
-            // Set current date as default
+            // Set current dates as default
             const vehicles = JSON.parse(localStorage.getItem('vehicles'));
-            const currentDate = vehicles[index][`${docType}Date`] || new Date().toISOString().split('T')[0];
+            const currentStartDate = vehicles[index][`${docType}StartDate`] || '';
+            const currentEndDate = vehicles[index][`${docType}EndDate`] || '';
             
             currentForm.innerHTML = `
                 <p style="margin-bottom: 5px; font-weight: bold;">Обновяване на ${getDocName(docType)}</p>
-                <input type="date" id="newDocDate-${index}" value="${currentDate}" style="margin-bottom: 8px; width: 100%;">
+                <div class="form-group">
+                    <label for="newDocStartDate-${index}">Начална дата</label>
+                    <input type="date" id="newDocStartDate-${index}" value="${currentStartDate}" style="margin-bottom: 8px; width: 100%;">
+                </div>
+                <div class="form-group">
+                    <label for="newDocEndDate-${index}">Крайна дата</label>
+                    <input type="date" id="newDocEndDate-${index}" value="${currentEndDate}" style="margin-bottom: 8px; width: 100%;">
+                </div>
                 <div style="display: flex; gap: 5px;">
-                    <button onclick="saveDocumentDate(${index}, '${docType}')">Запази</button>
+                    <button onclick="saveDocumentDates(${index}, '${docType}')">Запази</button>
                     <button class="btn-danger" onclick="closeDocForm(${index})">Откажи</button>
                 </div>
             `;
             
             currentForm.style.display = 'block';
+        }
+        
+        // Save document dates
+        function saveDocumentDates(index, docType) {
+            const newStartDate = document.getElementById(`newDocStartDate-${index}`).value;
+            const newEndDate = document.getElementById(`newDocEndDate-${index}`).value;
+            
+            if (!newStartDate || !newEndDate) {
+                showAlert('Моля, въведете и двете дати!', 'danger');
+                return;
+            }
+            
+            const vehicles = JSON.parse(localStorage.getItem('vehicles'));
+            vehicles[index][`${docType}StartDate`] = newStartDate;
+            vehicles[index][`${docType}EndDate`] = newEndDate;
+            localStorage.setItem('vehicles', JSON.stringify(vehicles));
+            
+            showAlert(`Датите на ${getDocName(docType)} са обновени!`, 'success');
+            loadVehicles();
         }
         
         // Get document name
@@ -693,23 +921,6 @@
                 case 'insurance': return 'гражданска';
                 default: return 'документ';
             }
-        }
-        
-        // Save document date
-        function saveDocumentDate(index, docType) {
-            const newDate = document.getElementById(`newDocDate-${index}`).value;
-            
-            if (!newDate) {
-                showAlert('Моля, изберете дата!', 'danger');
-                return;
-            }
-            
-            const vehicles = JSON.parse(localStorage.getItem('vehicles'));
-            vehicles[index][`${docType}Date`] = newDate;
-            localStorage.setItem('vehicles', JSON.stringify(vehicles));
-            
-            showAlert(`Датата на ${getDocName(docType)} е обновена!`, 'success');
-            loadVehicles();
         }
         
         // Close document form
@@ -772,15 +983,115 @@
         
         // Delete vehicle
         function deleteVehicle(index) {
-            if (!confirm('Сигурни ли сте, че искате да изтриете това превозно средство?')) {
+            if (!confirm('Сигурни ли сте, че искате да изтриете това МПС?')) {
                 return;
             }
             
             const vehicles = JSON.parse(localStorage.getItem('vehicles'));
             vehicles.splice(index, 1);
             localStorage.setItem('vehicles', JSON.stringify(vehicles));
-            showAlert('Превозното средство е изтрито!', 'success');
+            showAlert('МПС-то е изтрито!', 'success');
             loadVehicles();
+        }
+        
+        // Repair functions
+        function addNewRepair(vehicleIndex) {
+            currentVehicleIndex = vehicleIndex;
+            currentRepairIndex = null;
+            isEditingRepair = false;
+            
+            document.getElementById('repairModalTitle').textContent = 'Добавяне на ремонт';
+            document.getElementById('repairDescription').value = '';
+            document.getElementById('repairDate').value = '';
+            document.getElementById('repairMileage').value = '';
+            document.getElementById('repairCost').value = '';
+            
+            repairModal.style.display = 'flex';
+        }
+        
+        function editRepair(vehicleIndex, repairIndex) {
+            currentVehicleIndex = vehicleIndex;
+            currentRepairIndex = repairIndex;
+            isEditingRepair = true;
+            
+            const vehicles = JSON.parse(localStorage.getItem('vehicles'));
+            const repair = vehicles[vehicleIndex].repairs[repairIndex];
+            
+            document.getElementById('repairModalTitle').textContent = 'Редактиране на ремонт';
+            document.getElementById('repairDescription').value = repair.description;
+            document.getElementById('repairDate').value = repair.date || '';
+            document.getElementById('repairMileage').value = repair.mileage || '';
+            document.getElementById('repairCost').value = repair.cost || '';
+            
+            repairModal.style.display = 'flex';
+        }
+        
+        function saveRepair() {
+            const description = document.getElementById('repairDescription').value.trim();
+            const date = document.getElementById('repairDate').value;
+            const mileage = document.getElementById('repairMileage').value;
+            const cost = document.getElementById('repairCost').value;
+            
+            if (!description) {
+                showAlert('Моля, въведете описание на ремонта!', 'danger');
+                return;
+            }
+            
+            const vehicles = JSON.parse(localStorage.getItem('vehicles'));
+            
+            const repair = {
+                description: description,
+                date: date || null,
+                mileage: mileage ? parseInt(mileage) : null,
+                cost: cost ? parseFloat(cost) : null,
+                completed: !!date
+            };
+            
+            if (isEditingRepair) {
+                vehicles[currentVehicleIndex].repairs[currentRepairIndex] = repair;
+            } else {
+                if (!vehicles[currentVehicleIndex].repairs) {
+                    vehicles[currentVehicleIndex].repairs = [];
+                }
+                vehicles[currentVehicleIndex].repairs.push(repair);
+            }
+            
+            localStorage.setItem('vehicles', JSON.stringify(vehicles));
+            closeRepairModal();
+            showAlert('Ремонтът е запазен!', 'success');
+            loadVehicles();
+        }
+        
+        function completeRepair(vehicleIndex, repairIndex) {
+            const vehicles = JSON.parse(localStorage.getItem('vehicles'));
+            const repair = vehicles[vehicleIndex].repairs[repairIndex];
+            
+            const today = new Date().toISOString().split('T')[0];
+            const currentMileage = vehicles[vehicleIndex].currentMileage;
+            
+            repair.date = today;
+            repair.mileage = currentMileage;
+            repair.completed = true;
+            
+            localStorage.setItem('vehicles', JSON.stringify(vehicles));
+            showAlert('Ремонтът е маркиран като завършен!', 'success');
+            loadVehicles();
+        }
+        
+        function deleteRepair(vehicleIndex, repairIndex) {
+            if (!confirm('Сигурни ли сте, че искате да изтриете този ремонт?')) {
+                return;
+            }
+            
+            const vehicles = JSON.parse(localStorage.getItem('vehicles'));
+            vehicles[vehicleIndex].repairs.splice(repairIndex, 1);
+            localStorage.setItem('vehicles', JSON.stringify(vehicles));
+            showAlert('Ремонтът е изтрит!', 'success');
+            loadVehicles();
+        }
+        
+        function closeRepairModal() {
+            repairModal.style.display = 'none';
         }
         
         // Show alert
