@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Сервизен интервал - Проследяване на коли</title>
+    <title>Автомобилен помощник - сервиз и документи</title>
     <style>
         :root {
             --primary: #2c3e50;
@@ -13,6 +13,7 @@
             --warning: #f39c12;
             --light: #ecf0f1;
             --dark: #2c3e50;
+            --info: #17a2b8;
         }
         
         * {
@@ -102,6 +103,10 @@
             background: var(--warning);
         }
         
+        .btn-info {
+            background: var(--info);
+        }
+        
         .alert {
             padding: 15px;
             border-radius: 4px;
@@ -121,6 +126,11 @@
         .alert-success {
             background: #d4edda;
             border-left: 4px solid var(--success);
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            border-left: 4px solid var(--info);
         }
         
         .status-box {
@@ -158,12 +168,27 @@
             align-items: center;
         }
         
-        .service-badge {
-            background: var(--success);
+        .badge {
             color: white;
             padding: 2px 8px;
             border-radius: 10px;
             font-size: 12px;
+        }
+        
+        .service-badge {
+            background: var(--success);
+        }
+        
+        .vignette-badge {
+            background: var(--info);
+        }
+        
+        .inspection-badge {
+            background: var(--secondary);
+        }
+        
+        .insurance-badge {
+            background: #6f42c1;
         }
         
         .vehicles-list {
@@ -227,10 +252,17 @@
             vertical-align: middle;
         }
         
-        .notification-settings {
+        .documents-section {
             margin-top: 15px;
             padding-top: 15px;
             border-top: 1px solid #eee;
+        }
+        
+        .document-item {
+            margin-bottom: 10px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 4px;
         }
         
         @media (max-width: 768px) {
@@ -248,13 +280,13 @@
 <body>
     <div class="container">
         <header>
-            <h1>Проследяване на сервизни интервали</h1>
-            <p>Следи кога дойде време за смяна на масло или други услуги за всички ваши превозни средства</p>
+            <h1>Автомобилен помощник</h1>
+            <p>Проследяване на сервизни интервали и документи за вашите превозни средства</p>
         </header>
         
         <div class="tab-buttons">
-            <button class="tab-btn active" onclick="openTab('manage')">Управление на коли</button>
-            <button class="tab-btn" onclick="openTab('add')">Добави ново превозно средство</button>
+            <button class="tab-btn active" onclick="openTab('manage')">Вашите коли</button>
+            <button class="tab-btn" onclick="openTab('add')">Добави ново ППС</button>
         </div>
         
         <div id="manage" class="tab-content active">
@@ -298,6 +330,21 @@
                     <label for="initialMileage">Начален километраж</label>
                     <input type="number" id="initialMileage" placeholder="Например: 180000">
                 </div>
+                
+                <h3 style="margin-top: 20px;">Документи (по избор)</h3>
+                <div class="form-group">
+                    <label for="vignetteDate">Дата на винетка (ако има)</label>
+                    <input type="date" id="vignetteDate">
+                </div>
+                <div class="form-group">
+                    <label for="inspectionDate">Дата на последен преглед (ако има)</label>
+                    <input type="date" id="inspectionDate">
+                </div>
+                <div class="form-group">
+                    <label for="insuranceDate">Дата на гражданска отговорност (ако има)</label>
+                    <input type="date" id="insuranceDate">
+                </div>
+                
                 <button id="addVehicleBtn" class="btn-success">Добави превозно средство</button>
             </div>
         </div>
@@ -383,21 +430,91 @@
                     statusText = `Оставащи км: ${kmLeft}`;
                 }
                 
+                // Documents section
+                let documentsHTML = '';
+                
+                if (vehicle.vignetteDate) {
+                    const vignetteEnd = new Date(vehicle.vignetteDate);
+                    vignetteEnd.setFullYear(vignetteEnd.getFullYear() + 1);
+                    const daysLeft = Math.ceil((vignetteEnd - new Date()) / (1000 * 60 * 60 * 24));
+                    
+                    let vignetteStatus = '';
+                    if (daysLeft <= 0) {
+                        vignetteStatus = `<span class="warning">Изтекла преди ${Math.abs(daysLeft)} дни!</span>`;
+                    } else if (daysLeft <= 30) {
+                        vignetteStatus = `<span class="warning">Изтича след ${daysLeft} дни!</span>`;
+                    } else {
+                        vignetteStatus = `Изтича на ${vignetteEnd.toLocaleDateString('bg-BG')}`;
+                    }
+                    
+                    documentsHTML += `
+                        <div class="document-item">
+                            <strong><span class="badge vignette-badge">Винетка</span></strong>
+                            <p>Валидна до: ${vignetteStatus}</p>
+                            <button class="btn-info" onclick="updateDocumentDate(${index}, 'vignette')">Обнови дата</button>
+                        </div>
+                    `;
+                }
+                
+                if (vehicle.inspectionDate) {
+                    const inspectionEnd = new Date(vehicle.inspectionDate);
+                    inspectionEnd.setFullYear(inspectionEnd.getFullYear() + 1);
+                    const daysLeft = Math.ceil((inspectionEnd - new Date()) / (1000 * 60 * 60 * 24));
+                    
+                    let inspectionStatus = '';
+                    if (daysLeft <= 0) {
+                        inspectionStatus = `<span class="warning">Изтекъл преди ${Math.abs(daysLeft)} дни!</span>`;
+                    } else if (daysLeft <= 30) {
+                        inspectionStatus = `<span class="warning">Изтича след ${daysLeft} дни!</span>`;
+                    } else {
+                        inspectionStatus = `Изтича на ${inspectionEnd.toLocaleDateString('bg-BG')}`;
+                    }
+                    
+                    documentsHTML += `
+                        <div class="document-item">
+                            <strong><span class="badge inspection-badge">Годишен преглед</span></strong>
+                            <p>Валиден до: ${inspectionStatus}</p>
+                            <button class="btn-info" onclick="updateDocumentDate(${index}, 'inspection')">Обнови дата</button>
+                        </div>
+                    `;
+                }
+                
+                if (vehicle.insuranceDate) {
+                    const insuranceEnd = new Date(vehicle.insuranceDate);
+                    insuranceEnd.setFullYear(insuranceEnd.getFullYear() + 1);
+                    const daysLeft = Math.ceil((insuranceEnd - new Date()) / (1000 * 60 * 60 * 24));
+                    
+                    let insuranceStatus = '';
+                    if (daysLeft <= 0) {
+                        insuranceStatus = `<span class="warning">Изтекла преди ${Math.abs(daysLeft)} дни!</span>`;
+                    } else if (daysLeft <= 30) {
+                        insuranceStatus = `<span class="warning">Изтича след ${daysLeft} дни!</span>`;
+                    } else {
+                        insuranceStatus = `Изтича на ${insuranceEnd.toLocaleDateString('bg-BG')}`;
+                    }
+                    
+                    documentsHTML += `
+                        <div class="document-item">
+                            <strong><span class="badge insurance-badge">Гражданска</span></strong>
+                            <p>Валидна до: ${insuranceStatus}</p>
+                            <button class="btn-info" onclick="updateDocumentDate(${index}, 'insurance')">Обнови дата</button>
+                        </div>
+                    `;
+                }
+                
                 vehicleCard.innerHTML = `
                     <h3>${vehicle.brand} ${vehicle.model}</h3>
                     <p><strong>Тип:</strong> ${typeText}</p>
                     <p><strong>Сервизен интервал:</strong> ${vehicle.serviceInterval} км</p>
-                    <p><strong>Уведомяване при:</strong> ${notifyKm} км преди смяна</p>
                     <p><strong>Текущ километраж:</strong> ${currentMileage} км</p>
                     <p><strong>Последна смяна при:</strong> ${lastService} км</p>
                     <div class="alert ${statusClass}" style="margin: 10px 0; padding: 8px;">
                         <span class="exclamation ${pulseClass}">${exclamation}</span>
                         <strong>${statusText}</strong>
                     </div>
-                    <div class="notification-settings">
-                        <input type="number" id="updateNotifyKm-${index}" value="${notifyKm}" placeholder="Км за уведомление" style="width: 100px; margin-right: 10px;">
-                        <button onclick="updateNotificationKm(${index})">Запази уведомление</button>
-                    </div>
+                    
+                    ${documentsHTML ? `<div class="documents-section"><h4>Документи</h4>${documentsHTML}</div>` : ''}
+                    
                     <div class="vehicle-actions">
                         <button class="btn-warning" onclick="openUpdateMileageForm(${index})">Обнови километраж</button>
                         <button class="btn-success" onclick="recordService(${index})">Запиши смяна</button>
@@ -408,6 +525,12 @@
                         <input type="number" id="newMileage-${index}" placeholder="Нов километраж" style="margin-bottom: 10px;">
                         <button onclick="updateVehicleMileage(${index})">Запази</button>
                         <button class="btn-danger" onclick="closeUpdateForm(${index})">Откажи</button>
+                    </div>
+                    
+                    <div id="updateDocForm-${index}" style="display: none; margin-top: 10px;">
+                        <input type="date" id="newDocDate-${index}" style="margin-bottom: 10px;">
+                        <button onclick="saveDocumentDate(${index})">Запази</button>
+                        <button class="btn-danger" onclick="closeDocForm(${index})">Откажи</button>
                     </div>
                 `;
                 
@@ -423,6 +546,9 @@
             const interval = parseInt(document.getElementById('serviceInterval').value);
             const notifyKm = parseInt(document.getElementById('notificationKm').value) || 0;
             const initialMileage = parseInt(document.getElementById('initialMileage').value);
+            const vignetteDate = document.getElementById('vignetteDate').value;
+            const inspectionDate = document.getElementById('inspectionDate').value;
+            const insuranceDate = document.getElementById('insuranceDate').value;
             
             // Validation
             if (!brand || !model) {
@@ -442,7 +568,7 @@
             
             const vehicles = JSON.parse(localStorage.getItem('vehicles')) || [];
             
-            vehicles.push({
+            const newVehicle = {
                 type: type,
                 brand: brand,
                 model: model,
@@ -452,7 +578,14 @@
                 currentMileage: initialMileage,
                 lastServiceMileage: initialMileage,
                 history: []
-            });
+            };
+            
+            // Add documents if provided
+            if (vignetteDate) newVehicle.vignetteDate = vignetteDate;
+            if (inspectionDate) newVehicle.inspectionDate = inspectionDate;
+            if (insuranceDate) newVehicle.insuranceDate = insuranceDate;
+            
+            vehicles.push(newVehicle);
             
             localStorage.setItem('vehicles', JSON.stringify(vehicles));
             
@@ -462,22 +595,64 @@
             document.getElementById('serviceInterval').value = '';
             document.getElementById('notificationKm').value = '';
             document.getElementById('initialMileage').value = '';
+            document.getElementById('vignetteDate').value = '';
+            document.getElementById('inspectionDate').value = '';
+            document.getElementById('insuranceDate').value = '';
             
             showAlert('Превозното средство е добавено успешно!', 'success');
             loadVehicles();
             openTab('manage');
         }
         
-        // Update notification km
-        function updateNotificationKm(index) {
-            const notifyKm = parseInt(document.getElementById(`updateNotifyKm-${index}`).value) || 0;
+        // Open update document form
+        function updateDocumentDate(index, docType) {
+            const formId = `updateDocForm-${index}`;
+            const currentForm = document.getElementById(formId);
+            
+            // Set current date as default
+            const vehicles = JSON.parse(localStorage.getItem('vehicles'));
+            const currentDate = vehicles[index][`${docType}Date`] || new Date().toISOString().split('T')[0];
+            
+            currentForm.innerHTML = `
+                <h4>Обновяване на ${getDocName(docType)}</h4>
+                <input type="date" id="newDocDate-${index}" value="${currentDate}" style="margin-bottom: 10px;">
+                <button onclick="saveDocumentDate(${index}, '${docType}')">Запази</button>
+                <button class="btn-danger" onclick="closeDocForm(${index})">Откажи</button>
+            `;
+            
+            currentForm.style.display = 'block';
+        }
+        
+        // Get document name
+        function getDocName(docType) {
+            switch(docType) {
+                case 'vignette': return 'винетка';
+                case 'inspection': return 'годишен преглед';
+                case 'insurance': return 'гражданска отговорност';
+                default: return 'документ';
+            }
+        }
+        
+        // Save document date
+        function saveDocumentDate(index, docType) {
+            const newDate = document.getElementById(`newDocDate-${index}`).value;
+            
+            if (!newDate) {
+                showAlert('Моля, изберете дата!', 'danger');
+                return;
+            }
             
             const vehicles = JSON.parse(localStorage.getItem('vehicles'));
-            vehicles[index].notificationKm = notifyKm;
+            vehicles[index][`${docType}Date`] = newDate;
             localStorage.setItem('vehicles', JSON.stringify(vehicles));
             
-            showAlert('Настройките за уведомление са запазени!', 'success');
+            showAlert(`Датата на ${getDocName(docType)} е обновена!`, 'success');
             loadVehicles();
+        }
+        
+        // Close document form
+        function closeDocForm(index) {
+            document.getElementById(`updateDocForm-${index}`).style.display = 'none';
         }
         
         // Open update mileage form
