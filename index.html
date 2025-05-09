@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сервизен интервал - Проследяване на коли</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: var(--light);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        button:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: var(--success);
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        
+        .alert-warning {
+            background: #f8e7a5;
+            border-left: 4px solid var(--warning);
+        }
+        
+        .alert-danger {
+            background: #f5c6cb;
+            border-left: 4px solid var(--danger);
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            border-left: 4px solid var(--success);
+        }
+        
+        .status-box {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            margin-top: 20px;
+            border-left: 4px solid var(--secondary);
+        }
+        
+        .warning {
+            color: var(--danger);
+            font-weight: bold;
+            animation: blink 1s infinite;
+        }
+        
+        .pulse {
+            animation: pulse 0.5s infinite alternate;
+        }
+        
+        @keyframes blink {
+            50% { opacity: 0.5; }
+        }
+        
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.05); }
+        }
+        
+        .history-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .service-badge {
+            background: var(--success);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+        
+        .vehicles-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .vehicle-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 15px;
+            position: relative;
+        }
+        
+        .vehicle-card h3 {
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+        
+        .vehicle-actions {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab-btn {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            color: var(--dark);
+        }
+        
+        .tab-btn.active {
+            border-bottom: 3px solid var(--secondary);
+            font-weight: bold;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .exclamation {
+            color: var(--danger);
+            font-size: 24px;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+        
+        .notification-settings {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        
+        @media (max-width: 768px) {
+            .vehicles-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .tab-buttons {
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Проследяване на сервизни интервали</h1>
+            <p>Следи кога дойде време за смяна на масло или други услуги за всички ваши превозни средства</p>
+        </header>
+        
+        <div class="tab-buttons">
+            <button class="tab-btn active" onclick="openTab('manage')">Управление на коли</button>
+            <button class="tab-btn" onclick="openTab('add')">Добави ново превозно средство</button>
+        </div>
+        
+        <div id="manage" class="tab-content active">
+            <div class="card">
+                <h2>Вашите превозни средства</h2>
+                <div id="vehiclesContainer" class="vehicles-list">
+                    <!-- Колите ще се показват тук -->
+                </div>
+            </div>
+        </div>
+        
+        <div id="add" class="tab-content">
+            <div class="card">
+                <h2>Добавяне на ново превозно средство</h2>
+                <div class="form-group">
+                    <label for="vehicleType">Тип превозно средство</label>
+                    <select id="vehicleType" class="form-control">
+                        <option value="car">Лека кола</option>
+                        <option value="truck">Камион</option>
+                        <option value="motorcycle">Мотор</option>
+                        <option value="other">Друго</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="vehicleBrand">Марка</label>
+                    <input type="text" id="vehicleBrand" placeholder="Например: Volkswagen">
+                </div>
+                <div class="form-group">
+                    <label for="vehicleModel">Модел</label>
+                    <input type="text" id="vehicleModel" placeholder="Например: Golf">
+                </div>
+                <div class="form-group">
+                    <label for="serviceInterval">Сервизен интервал (км)</label>
+                    <input type="number" id="serviceInterval" placeholder="Например: 10000">
+                </div>
+                <div class="form-group">
+                    <label for="notificationKm">Уведомяване предварително (км)</label>
+                    <input type="number" id="notificationKm" placeholder="Например: 500 (за 500 км преди смяна)">
+                </div>
+                <div class="form-group">
+                    <label for="initialMileage">Начален километраж</label>
+                    <input type="number" id="initialMileage" placeholder="Например: 180000">
+                </div>
+                <button id="addVehicleBtn" class="btn-success">Добави превозно средство</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const vehiclesContainer = document.getElementById('vehiclesContainer');
+        const addVehicleBtn = document.getElementById('addVehicleBtn');
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadVehicles();
+            
+            // Set up event listeners
+            addVehicleBtn.addEventListener('click', addNewVehicle);
+        });
+        
+        // Tab navigation
+        function openTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Deactivate all tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Activate the selected tab
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+        
+        // Load all vehicles
+        function loadVehicles() {
+            const vehicles = JSON.parse(localStorage.getItem('vehicles')) || [];
+            
+            if (vehicles.length === 0) {
+                vehiclesContainer.innerHTML = '<p>Нямате добавени превозни средства. Моля, добавете първото.</p>';
+                return;
+            }
+            
+            vehiclesContainer.innerHTML = '';
+            
+            vehicles.forEach((vehicle, index) => {
+                const vehicleCard = document.createElement('div');
+                vehicleCard.className = 'vehicle-card';
+                
+                let typeText = '';
+                switch(vehicle.type) {
+                    case 'car': typeText = 'Лека кола'; break;
+                    case 'truck': typeText = 'Камион'; break;
+                    case 'motorcycle': typeText = 'Мотор'; break;
+                    default: typeText = 'Превозно средство';
+                }
+                
+                // Calculate service status
+                const lastService = vehicle.lastServiceMileage || vehicle.initialMileage;
+                const currentMileage = vehicle.currentMileage || vehicle.initialMileage;
+                const kmSinceService = currentMileage - lastService;
+                const kmLeft = vehicle.serviceInterval - kmSinceService;
+                const notifyKm = vehicle.notificationKm || 0;
+                
+                let statusClass = '';
+                let statusText = '';
+                let exclamation = '';
+                let pulseClass = '';
+                
+                if (kmSinceService >= vehicle.serviceInterval) {
+                    statusClass = 'alert-danger';
+                    statusText = '!!! ВРЕМЕ Е ЗА СМЯНА !!!';
+                    exclamation = '❗';
+                    pulseClass = 'pulse';
+                } else if (kmLeft <= notifyKm) {
+                    statusClass = 'alert-warning';
+                    statusText = `Оставащи км: ${kmLeft} (Уведомление!)`;
+                    exclamation = '❗';
+                    pulseClass = 'pulse';
+                } else {
+                    statusClass = 'alert-success';
+                    statusText = `Оставащи км: ${kmLeft}`;
+                }
+                
+                vehicleCard.innerHTML = `
+                    <h3>${vehicle.brand} ${vehicle.model}</h3>
+                    <p><strong>Тип:</strong> ${typeText}</p>
+                    <p><strong>Сервизен интервал:</strong> ${vehicle.serviceInterval} км</p>
+                    <p><strong>Уведомяване при:</strong> ${notifyKm} км преди смяна</p>
+                    <p><strong>Текущ километраж:</strong> ${currentMileage} км</p>
+                    <p><strong>Последна смяна при:</strong> ${lastService} км</p>
+                    <div class="alert ${statusClass}" style="margin: 10px 0; padding: 8px;">
+                        <span class="exclamation ${pulseClass}">${exclamation}</span>
+                        <strong>${statusText}</strong>
+                    </div>
+                    <div class="notification-settings">
+                        <input type="number" id="updateNotifyKm-${index}" value="${notifyKm}" placeholder="Км за уведомление" style="width: 100px; margin-right: 10px;">
+                        <button onclick="updateNotificationKm(${index})">Запази уведомление</button>
+                    </div>
+                    <div class="vehicle-actions">
+                        <button class="btn-warning" onclick="openUpdateMileageForm(${index})">Обнови километраж</button>
+                        <button class="btn-success" onclick="recordService(${index})">Запиши смяна</button>
+                        <button class="btn-danger" onclick="deleteVehicle(${index})">Изтрий</button>
+                    </div>
+                    
+                    <div id="updateForm-${index}" style="display: none; margin-top: 10px;">
+                        <input type="number" id="newMileage-${index}" placeholder="Нов километраж" style="margin-bottom: 10px;">
+                        <button onclick="updateVehicleMileage(${index})">Запази</button>
+                        <button class="btn-danger" onclick="closeUpdateForm(${index})">Откажи</button>
+                    </div>
+                `;
+                
+                vehiclesContainer.appendChild(vehicleCard);
+            });
+        }
+        
+        // Add new vehicle
+        function addNewVehicle() {
+            const type = document.getElementById('vehicleType').value;
+            const brand = document.getElementById('vehicleBrand').value.trim();
+            const model = document.getElementById('vehicleModel').value.trim();
+            const interval = parseInt(document.getElementById('serviceInterval').value);
+            const notifyKm = parseInt(document.getElementById('notificationKm').value) || 0;
+            const initialMileage = parseInt(document.getElementById('initialMileage').value);
+            
+            // Validation
+            if (!brand || !model) {
+                showAlert('Моля, въведете марка и модел!', 'danger');
+                return;
+            }
+            
+            if (isNaN(interval) || interval <= 0) {
+                showAlert('Моля, въведете валиден сервизен интервал!', 'danger');
+                return;
+            }
+            
+            if (isNaN(initialMileage)) {
+                showAlert('Моля, въведете валиден начален километраж!', 'danger');
+                return;
+            }
+            
+            const vehicles = JSON.parse(localStorage.getItem('vehicles')) || [];
+            
+            vehicles.push({
+                type: type,
+                brand: brand,
+                model: model,
+                serviceInterval: interval,
+                notificationKm: notifyKm,
+                initialMileage: initialMileage,
+                currentMileage: initialMileage,
+                lastServiceMileage: initialMileage,
+                history: []
+            });
+            
+            localStorage.setItem('vehicles', JSON.stringify(vehicles));
+            
+            // Clear form
+            document.getElementById('vehicleBrand').value = '';
+            document.getElementById('vehicleModel').value = '';
+            document.getElementById('serviceInterval').value = '';
+            document.getElementById('notificationKm').value = '';
+            document.getElementById('initialMileage').value = '';
+            
+            showAlert('Превозното средство е добавено успешно!', 'success');
+            loadVehicles();
+            openTab('manage');
+        }
+        
+        // Update notification km
+        function updateNotificationKm(index) {
+            const notifyKm = parseInt(document.getElementById(`updateNotifyKm-${index}`).value) || 0;
+            
+            const vehicles = JSON.parse(localStorage.getItem('vehicles'));
+            vehicles[index].notificationKm = notifyKm;
+            localStorage.setItem('vehicles', JSON.stringify(vehicles));
+            
+            showAlert('Настройките за уведомление са запазени!', 'success');
+            loadVehicles();
+        }
+        
+        // Open update mileage form
+        function openUpdateMileageForm(index) {
+            document.getElementById(`updateForm-${index}`).style.display = 'block';
+        }
+        
+        // Close update form
+        function closeUpdateForm(index) {
+            document.getElementById(`updateForm-${index}`).style.display = 'none';
+        }
+        
+        // Update vehicle mileage
+        function updateVehicleMileage(index) {
+            const newMileage = parseInt(document.getElementById(`newMileage-${index}`).value);
+            
+            if (isNaN(newMileage)) {
+                showAlert('Моля, въведете валиден километраж!', 'danger');
+                return;
+            }
+            
+            const vehicles = JSON.parse(localStorage.getItem('vehicles'));
+            vehicles[index].currentMileage = newMileage;
+            
+            // Add to history
+            vehicles[index].history.push({
+                date: new Date().toLocaleString('bg-BG'),
+                mileage: newMileage,
+                type: 'update'
+            });
+            
+            localStorage.setItem('vehicles', JSON.stringify(vehicles));
+            showAlert('Километражът е обновен!', 'success');
+            loadVehicles();
+        }
+        
+        // Record service for vehicle
+        function recordService(index) {
+            const vehicles = JSON.parse(localStorage.getItem('vehicles'));
+            const currentMileage = vehicles[index].currentMileage;
+            
+            vehicles[index].lastServiceMileage = currentMileage;
+            
+            // Add to history
+            vehicles[index].history.push({
+                date: new Date().toLocaleString('bg-BG'),
+                mileage: currentMileage,
+                type: 'service'
+            });
+            
+            localStorage.setItem('vehicles', JSON.stringify(vehicles));
+            showAlert('Смяната е записана успешно!', 'success');
+            loadVehicles();
+        }
+        
+        // Delete vehicle
+        function deleteVehicle(index) {
+            if (!confirm('Сигурни ли сте, че искате да изтриете това превозно средство?')) {
+                return;
+            }
+            
+            const vehicles = JSON.parse(localStorage.getItem('vehicles'));
+            vehicles.splice(index, 1);
+            localStorage.setItem('vehicles', JSON.stringify(vehicles));
+            showAlert('Превозното средство е изтрито!', 'success');
+            loadVehicles();
+        }
+        
+        // Show alert
+        function showAlert(message, type) {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alert.style.position = 'fixed';
+            alert.style.top = '20px';
+            alert.style.right = '20px';
+            alert.style.zIndex = '1000';
+            alert.style.maxWidth = '300px';
+            
+            document.body.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
