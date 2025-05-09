@@ -27,7 +27,7 @@
             line-height: 1.6;
             color: var(--dark);
             background-color: var(--light);
-            padding: 20px;
+            padding: 10px;
             min-height: 100vh;
         }
         
@@ -35,60 +35,63 @@
             width: 100%;
             max-width: 1200px;
             margin: 0 auto;
+            padding: 5px;
         }
         
         header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 15px;
+            padding: 10px;
         }
         
         h1 {
             color: var(--primary);
-            margin-bottom: 10px;
+            margin-bottom: 5px;
+            font-size: 1.5rem;
         }
         
         .card {
             background: white;
             border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            padding: 25px;
-            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 15px;
+            margin-bottom: 15px;
         }
         
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
         
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
             font-weight: 600;
+            font-size: 0.9rem;
         }
         
         input, select {
             width: 100%;
-            padding: 10px;
+            padding: 8px;
             border: 1px solid #ddd;
             border-radius: 4px;
-            font-size: 16px;
+            font-size: 0.9rem;
         }
         
         button {
-            padding: 10px 20px;
+            padding: 8px 15px;
             background: var(--secondary);
             color: white;
             border: none;
             border-radius: 4px;
-            font-size: 16px;
+            font-size: 0.9rem;
             cursor: pointer;
             transition: all 0.3s;
-            margin-right: 10px;
-            margin-bottom: 10px;
+            margin-right: 8px;
+            margin-bottom: 8px;
         }
         
         button:hover {
             background: #2980b9;
-            transform: translateY(-2px);
         }
         
         .btn-success {
@@ -108,9 +111,10 @@
         }
         
         .alert {
-            padding: 15px;
+            padding: 10px;
             border-radius: 4px;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
         }
         
         .alert-warning {
@@ -134,11 +138,12 @@
         }
         
         .status-box {
-            padding: 15px;
+            padding: 10px;
             background: #f8f9fa;
             border-radius: 4px;
-            margin-top: 20px;
+            margin-top: 15px;
             border-left: 4px solid var(--secondary);
+            font-size: 0.9rem;
         }
         
         .warning {
@@ -160,19 +165,13 @@
             to { transform: scale(1.05); }
         }
         
-        .history-item {
-            padding: 12px 0;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
         .badge {
             color: white;
-            padding: 2px 8px;
+            padding: 2px 6px;
             border-radius: 10px;
-            font-size: 12px;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-right: 5px;
         }
         
         .service-badge {
@@ -193,43 +192,53 @@
         
         .vehicles-list {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
         }
         
         .vehicle-card {
             background: white;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding: 15px;
+            padding: 12px;
             position: relative;
         }
         
         .vehicle-card h3 {
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             color: var(--primary);
+            font-size: 1.1rem;
+        }
+        
+        .vehicle-card p {
+            margin-bottom: 5px;
+            font-size: 0.9rem;
         }
         
         .vehicle-actions {
             margin-top: 10px;
             display: flex;
             flex-wrap: wrap;
+            gap: 5px;
         }
         
         .tab-buttons {
             display: flex;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             border-bottom: 1px solid #ddd;
+            overflow-x: auto;
         }
         
         .tab-btn {
-            padding: 10px 20px;
+            padding: 8px 15px;
             background: none;
             border: none;
             border-bottom: 3px solid transparent;
             cursor: pointer;
             color: var(--dark);
+            font-size: 0.9rem;
+            white-space: nowrap;
         }
         
         .tab-btn.active {
@@ -247,32 +256,60 @@
         
         .exclamation {
             color: var(--danger);
-            font-size: 24px;
-            margin-right: 5px;
+            font-size: 1.2rem;
+            margin-right: 3px;
             vertical-align: middle;
         }
         
         .documents-section {
-            margin-top: 15px;
-            padding-top: 15px;
+            margin-top: 12px;
+            padding-top: 12px;
             border-top: 1px solid #eee;
         }
         
         .document-item {
-            margin-bottom: 10px;
-            padding: 8px;
+            margin-bottom: 8px;
+            padding: 6px;
             background: #f8f9fa;
             border-radius: 4px;
+            font-size: 0.9rem;
         }
         
-        @media (max-width: 768px) {
-            .vehicles-list {
-                grid-template-columns: 1fr;
+        .date-range {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 2px;
+        }
+        
+        @media (min-width: 768px) {
+            .container {
+                padding: 15px;
             }
             
-            .tab-buttons {
-                overflow-x: auto;
-                white-space: nowrap;
+            header {
+                margin-bottom: 25px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .vehicle-card {
+                padding: 15px;
+            }
+            
+            .vehicle-card h3 {
+                font-size: 1.3rem;
+            }
+        }
+        
+        @media (min-width: 992px) {
+            .vehicles-list {
+                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
             }
         }
     </style>
@@ -281,7 +318,7 @@
     <div class="container">
         <header>
             <h1>Автомобилен помощник</h1>
-            <p>Проследяване на сервизни интервали и документи за вашите превозни средства</p>
+            <p style="font-size: 0.9rem;">Проследяване на сервизни интервали и документи</p>
         </header>
         
         <div class="tab-buttons">
@@ -291,7 +328,7 @@
         
         <div id="manage" class="tab-content active">
             <div class="card">
-                <h2>Вашите превозни средства</h2>
+                <h2 style="font-size: 1.2rem; margin-bottom: 10px;">Вашите превозни средства</h2>
                 <div id="vehiclesContainer" class="vehicles-list">
                     <!-- Колите ще се показват тук -->
                 </div>
@@ -300,7 +337,7 @@
         
         <div id="add" class="tab-content">
             <div class="card">
-                <h2>Добавяне на ново превозно средство</h2>
+                <h2 style="font-size: 1.2rem; margin-bottom: 10px;">Добавяне на ново превозно средство</h2>
                 <div class="form-group">
                     <label for="vehicleType">Тип превозно средство</label>
                     <select id="vehicleType" class="form-control">
@@ -331,17 +368,17 @@
                     <input type="number" id="initialMileage" placeholder="Например: 180000">
                 </div>
                 
-                <h3 style="margin-top: 20px;">Документи (по избор)</h3>
+                <h3 style="margin-top: 15px; font-size: 1.1rem;">Документи (по избор)</h3>
                 <div class="form-group">
-                    <label for="vignetteDate">Дата на винетка (ако има)</label>
+                    <label for="vignetteDate">Винетка от дата</label>
                     <input type="date" id="vignetteDate">
                 </div>
                 <div class="form-group">
-                    <label for="inspectionDate">Дата на последен преглед (ако има)</label>
+                    <label for="inspectionDate">Преглед от дата</label>
                     <input type="date" id="inspectionDate">
                 </div>
                 <div class="form-group">
-                    <label for="insuranceDate">Дата на гражданска отговорност (ако има)</label>
+                    <label for="insuranceDate">Гражданска от дата</label>
                     <input type="date" id="insuranceDate">
                 </div>
                 
@@ -380,12 +417,27 @@
             event.currentTarget.classList.add('active');
         }
         
+        // Format date for display
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('bg-BG');
+        }
+        
+        // Calculate end date (1 year later)
+        function calculateEndDate(startDate) {
+            if (!startDate) return '';
+            const date = new Date(startDate);
+            date.setFullYear(date.getFullYear() + 1);
+            return date;
+        }
+        
         // Load all vehicles
         function loadVehicles() {
             const vehicles = JSON.parse(localStorage.getItem('vehicles')) || [];
             
             if (vehicles.length === 0) {
-                vehiclesContainer.innerHTML = '<p>Нямате добавени превозни средства. Моля, добавете първото.</p>';
+                vehiclesContainer.innerHTML = '<p style="text-align: center;">Нямате добавени превозни средства. Моля, добавете първото.</p>';
                 return;
             }
             
@@ -434,8 +486,7 @@
                 let documentsHTML = '';
                 
                 if (vehicle.vignetteDate) {
-                    const vignetteEnd = new Date(vehicle.vignetteDate);
-                    vignetteEnd.setFullYear(vignetteEnd.getFullYear() + 1);
+                    const vignetteEnd = calculateEndDate(vehicle.vignetteDate);
                     const daysLeft = Math.ceil((vignetteEnd - new Date()) / (1000 * 60 * 60 * 24));
                     
                     let vignetteStatus = '';
@@ -444,21 +495,21 @@
                     } else if (daysLeft <= 30) {
                         vignetteStatus = `<span class="warning">Изтича след ${daysLeft} дни!</span>`;
                     } else {
-                        vignetteStatus = `Изтича на ${vignetteEnd.toLocaleDateString('bg-BG')}`;
+                        vignetteStatus = `Валидна до: ${formatDate(vignetteEnd)}`;
                     }
                     
                     documentsHTML += `
                         <div class="document-item">
                             <strong><span class="badge vignette-badge">Винетка</span></strong>
-                            <p>Валидна до: ${vignetteStatus}</p>
-                            <button class="btn-info" onclick="updateDocumentDate(${index}, 'vignette')">Обнови дата</button>
+                            <div>${formatDate(vehicle.vignetteDate)} - ${formatDate(vignetteEnd)}</div>
+                            <div>${vignetteStatus}</div>
+                            <button class="btn-info" style="margin-top: 5px;" onclick="updateDocumentDate(${index}, 'vignette')">Обнови</button>
                         </div>
                     `;
                 }
                 
                 if (vehicle.inspectionDate) {
-                    const inspectionEnd = new Date(vehicle.inspectionDate);
-                    inspectionEnd.setFullYear(inspectionEnd.getFullYear() + 1);
+                    const inspectionEnd = calculateEndDate(vehicle.inspectionDate);
                     const daysLeft = Math.ceil((inspectionEnd - new Date()) / (1000 * 60 * 60 * 24));
                     
                     let inspectionStatus = '';
@@ -467,21 +518,21 @@
                     } else if (daysLeft <= 30) {
                         inspectionStatus = `<span class="warning">Изтича след ${daysLeft} дни!</span>`;
                     } else {
-                        inspectionStatus = `Изтича на ${inspectionEnd.toLocaleDateString('bg-BG')}`;
+                        inspectionStatus = `Валиден до: ${formatDate(inspectionEnd)}`;
                     }
                     
                     documentsHTML += `
                         <div class="document-item">
-                            <strong><span class="badge inspection-badge">Годишен преглед</span></strong>
-                            <p>Валиден до: ${inspectionStatus}</p>
-                            <button class="btn-info" onclick="updateDocumentDate(${index}, 'inspection')">Обнови дата</button>
+                            <strong><span class="badge inspection-badge">Преглед</span></strong>
+                            <div>${formatDate(vehicle.inspectionDate)} - ${formatDate(inspectionEnd)}</div>
+                            <div>${inspectionStatus}</div>
+                            <button class="btn-info" style="margin-top: 5px;" onclick="updateDocumentDate(${index}, 'inspection')">Обнови</button>
                         </div>
                     `;
                 }
                 
                 if (vehicle.insuranceDate) {
-                    const insuranceEnd = new Date(vehicle.insuranceDate);
-                    insuranceEnd.setFullYear(insuranceEnd.getFullYear() + 1);
+                    const insuranceEnd = calculateEndDate(vehicle.insuranceDate);
                     const daysLeft = Math.ceil((insuranceEnd - new Date()) / (1000 * 60 * 60 * 24));
                     
                     let insuranceStatus = '';
@@ -490,14 +541,15 @@
                     } else if (daysLeft <= 30) {
                         insuranceStatus = `<span class="warning">Изтича след ${daysLeft} дни!</span>`;
                     } else {
-                        insuranceStatus = `Изтича на ${insuranceEnd.toLocaleDateString('bg-BG')}`;
+                        insuranceStatus = `Валидна до: ${formatDate(insuranceEnd)}`;
                     }
                     
                     documentsHTML += `
                         <div class="document-item">
                             <strong><span class="badge insurance-badge">Гражданска</span></strong>
-                            <p>Валидна до: ${insuranceStatus}</p>
-                            <button class="btn-info" onclick="updateDocumentDate(${index}, 'insurance')">Обнови дата</button>
+                            <div>${formatDate(vehicle.insuranceDate)} - ${formatDate(insuranceEnd)}</div>
+                            <div>${insuranceStatus}</div>
+                            <button class="btn-info" style="margin-top: 5px;" onclick="updateDocumentDate(${index}, 'insurance')">Обнови</button>
                         </div>
                     `;
                 }
@@ -505,32 +557,40 @@
                 vehicleCard.innerHTML = `
                     <h3>${vehicle.brand} ${vehicle.model}</h3>
                     <p><strong>Тип:</strong> ${typeText}</p>
-                    <p><strong>Сервизен интервал:</strong> ${vehicle.serviceInterval} км</p>
-                    <p><strong>Текущ километраж:</strong> ${currentMileage} км</p>
-                    <p><strong>Последна смяна при:</strong> ${lastService} км</p>
+                    <p><strong>Километраж:</strong> ${currentMileage} км</p>
+                    <p><strong>Последна смяна:</strong> ${lastService} км</p>
+                    
                     <div class="alert ${statusClass}" style="margin: 10px 0; padding: 8px;">
                         <span class="exclamation ${pulseClass}">${exclamation}</span>
                         <strong>${statusText}</strong>
+                        <div style="font-size: 0.8rem; margin-top: 3px;">
+                            Сервизен интервал: ${vehicle.serviceInterval} км
+                            ${notifyKm > 0 ? `(Уведомление при ${notifyKm} км)` : ''}
+                        </div>
                     </div>
                     
-                    ${documentsHTML ? `<div class="documents-section"><h4>Документи</h4>${documentsHTML}</div>` : ''}
+                    ${documentsHTML ? `<div class="documents-section"><h4 style="font-size: 1rem; margin-bottom: 8px;">Документи</h4>${documentsHTML}</div>` : ''}
                     
                     <div class="vehicle-actions">
-                        <button class="btn-warning" onclick="openUpdateMileageForm(${index})">Обнови километраж</button>
-                        <button class="btn-success" onclick="recordService(${index})">Запиши смяна</button>
+                        <button class="btn-warning" onclick="openUpdateMileageForm(${index})">Километраж</button>
+                        <button class="btn-success" onclick="recordService(${index})">Смяна</button>
                         <button class="btn-danger" onclick="deleteVehicle(${index})">Изтрий</button>
                     </div>
                     
                     <div id="updateForm-${index}" style="display: none; margin-top: 10px;">
-                        <input type="number" id="newMileage-${index}" placeholder="Нов километраж" style="margin-bottom: 10px;">
-                        <button onclick="updateVehicleMileage(${index})">Запази</button>
-                        <button class="btn-danger" onclick="closeUpdateForm(${index})">Откажи</button>
+                        <input type="number" id="newMileage-${index}" placeholder="Нов километраж" style="margin-bottom: 8px; width: 100%;">
+                        <div style="display: flex; gap: 5px;">
+                            <button onclick="updateVehicleMileage(${index})">Запази</button>
+                            <button class="btn-danger" onclick="closeUpdateForm(${index})">Откажи</button>
+                        </div>
                     </div>
                     
                     <div id="updateDocForm-${index}" style="display: none; margin-top: 10px;">
-                        <input type="date" id="newDocDate-${index}" style="margin-bottom: 10px;">
-                        <button onclick="saveDocumentDate(${index})">Запази</button>
-                        <button class="btn-danger" onclick="closeDocForm(${index})">Откажи</button>
+                        <input type="date" id="newDocDate-${index}" style="margin-bottom: 8px; width: 100%;">
+                        <div style="display: flex; gap: 5px;">
+                            <button onclick="saveDocumentDate(${index})">Запази</button>
+                            <button class="btn-danger" onclick="closeDocForm(${index})">Откажи</button>
+                        </div>
                     </div>
                 `;
                 
@@ -614,10 +674,12 @@
             const currentDate = vehicles[index][`${docType}Date`] || new Date().toISOString().split('T')[0];
             
             currentForm.innerHTML = `
-                <h4>Обновяване на ${getDocName(docType)}</h4>
-                <input type="date" id="newDocDate-${index}" value="${currentDate}" style="margin-bottom: 10px;">
-                <button onclick="saveDocumentDate(${index}, '${docType}')">Запази</button>
-                <button class="btn-danger" onclick="closeDocForm(${index})">Откажи</button>
+                <p style="margin-bottom: 5px; font-weight: bold;">Обновяване на ${getDocName(docType)}</p>
+                <input type="date" id="newDocDate-${index}" value="${currentDate}" style="margin-bottom: 8px; width: 100%;">
+                <div style="display: flex; gap: 5px;">
+                    <button onclick="saveDocumentDate(${index}, '${docType}')">Запази</button>
+                    <button class="btn-danger" onclick="closeDocForm(${index})">Откажи</button>
+                </div>
             `;
             
             currentForm.style.display = 'block';
@@ -627,8 +689,8 @@
         function getDocName(docType) {
             switch(docType) {
                 case 'vignette': return 'винетка';
-                case 'inspection': return 'годишен преглед';
-                case 'insurance': return 'гражданска отговорност';
+                case 'inspection': return 'преглед';
+                case 'insurance': return 'гражданска';
                 default: return 'документ';
             }
         }
@@ -730,7 +792,7 @@
             alert.style.top = '20px';
             alert.style.right = '20px';
             alert.style.zIndex = '1000';
-            alert.style.maxWidth = '300px';
+            alert.style.maxWidth = 'calc(100% - 40px)';
             
             document.body.appendChild(alert);
             
