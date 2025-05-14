@@ -430,21 +430,33 @@
             body * {
                 visibility: hidden;
             }
-            #printContent, #printContent * {
+            #printSection, #printSection * {
                 visibility: visible;
             }
-            #printContent {
+            #printSection {
                 position: absolute;
                 left: 0;
                 top: 0;
                 width: 100%;
                 padding: 20px;
+                font-size: 14px;
+                background: white;
             }
-            .vehicle-actions {
-                display: none !important;
+            .print-header {
+                text-align: center;
+                margin-bottom: 20px;
+                border-bottom: 2px solid #333;
+                padding-bottom: 10px;
             }
-            .alert {
-                border-left: none !important;
+            .print-section {
+                margin-bottom: 15px;
+                page-break-inside: avoid;
+            }
+            .print-title {
+                font-weight: bold;
+                border-bottom: 1px solid #ddd;
+                padding-bottom: 5px;
+                margin-bottom: 10px;
             }
         }
     </style>
@@ -452,7 +464,7 @@
 <body>
     <div class="container">
         <header>
-            <img src="https://raw.githubusercontent.com/Bpavlov321456/snimki/refs/heads/main/FA949ED9-AF4C-4E6F-960D-E108C80333AF.png" alt="Автомобилен помощник" class="logo">
+            <img src="https://raw.githubusercontent.com/Bpavlov321456/snimki/refs/heads/main/73ACEE65-0686-463F-90FC-7F8DBE806551.png" alt="Автомобилен помощник" class="logo">
             <h1>Автомобилен помощник</h1>
             <p style="font-size: 0.9rem;">Проследяване на сервизни интервали, документи и ремонти за вашето МПС</p>
         </header>
@@ -671,8 +683,8 @@
         </div>
     </div>
 
-    <!-- Print content (hidden by default) -->
-    <div id="printContent" style="display: none;"></div>
+    <!-- Print section (hidden by default) -->
+    <div id="printSection" style="display:none;"></div>
 
     <div class="footer">
         Всички права запазени &copy; <span id="currentYear"></span> carsinfo.bg
@@ -687,7 +699,7 @@
         const searchInput = document.getElementById('searchInput');
         const upcomingRepairModal = document.getElementById('upcomingRepairModal');
         const currentYearElement = document.getElementById('currentYear');
-        const printContent = document.getElementById('printContent');
+        const printSection = document.getElementById('printSection');
         
         // Global variables
         let currentVehicleIndex = null;
@@ -1089,182 +1101,128 @@
             const currentMileage = vehicle.currentMileage || vehicle.initialMileage;
             const kmSinceService = currentMileage - lastService;
             const kmLeft = vehicle.serviceInterval - kmSinceService;
-            const notifyKm = vehicle.notificationKm || 0;
             
             let statusText = '';
             if (kmSinceService >= vehicle.serviceInterval) {
                 statusText = '!!! ВРЕМЕ Е ЗА СМЯНА !!!';
-            } else if (kmLeft <= notifyKm) {
+            } else if (kmLeft <= (vehicle.notificationKm || 0)) {
                 statusText = `Оставащи км: ${kmLeft} (Уведомление!)`;
             } else {
                 statusText = `Оставащи км: ${kmLeft}`;
             }
             
-            // Documents section
-            let documentsHTML = '';
-            
-            // Vignette
-            if (vehicle.vignetteStartDate && vehicle.vignetteEndDate) {
-                const daysLeft = calculateDaysLeft(vehicle.vignetteEndDate);
+            // Prepare print content
+            let printContent = `
+                <div class="print-header">
+                    <h1>Информация за МПС</h1>
+                    <p>Отпечатано на ${new Date().toLocaleDateString('bg-BG')}</p>
+                </div>
                 
-                let vignetteStatus = '';
+                <div class="print-section">
+                    <div class="print-title">Основни данни</div>
+                    ${vehicle.ownerName ? `<p><strong>Собственик:</strong> ${vehicle.ownerName}</p>` : ''}
+                    <p><strong>Марка и модел:</strong> ${vehicle.brand} ${vehicle.model}</p>
+                    <p><strong>Тип:</strong> ${typeText}</p>
+                    ${vehicle.licensePlate ? `<p><strong>Рег. номер:</strong> ${vehicle.licensePlate}</p>` : ''}
+                    ${vehicle.vinNumber ? `<p><strong>VIN номер:</strong> ${vehicle.vinNumber}</p>` : ''}
+                    <p><strong>Километраж:</strong> ${currentMileage} км</p>
+                    <p><strong>Последна смяна:</strong> ${lastService} км</p>
+                </div>
+                
+                <div class="print-section">
+                    <div class="print-title">Сервизна информация</div>
+                    <p><strong>Статус:</strong> ${statusText}</p>
+                    <p><strong>Сервизен интервал:</strong> ${vehicle.serviceInterval} км</p>
+                    ${vehicle.notificationKm ? `<p><strong>Уведомление при:</strong> ${vehicle.notificationKm} км преди смяна</p>` : ''}
+                </div>
+            `;
+            
+            // Add documents if available
+            let documentsContent = '';
+            const addDocument = (title, startDate, endDate) => {
+                if (!startDate || !endDate) return '';
+                
+                const daysLeft = calculateDaysLeft(endDate);
+                let status = '';
                 if (daysLeft <= 0) {
-                    vignetteStatus = `Изтекла преди ${Math.abs(daysLeft)} дни!`;
+                    status = `Изтекъл преди ${Math.abs(daysLeft)} дни`;
                 } else if (daysLeft <= 30) {
-                    vignetteStatus = `Изтича след ${daysLeft} дни!`;
+                    status = `Изтича след ${daysLeft} дни`;
                 } else {
-                    vignetteStatus = `Валидна до: ${formatDate(vehicle.vignetteEndDate)}`;
+                    status = `Валиден до ${formatDate(endDate)}`;
                 }
                 
-                documentsHTML += `
-                    <div style="margin-bottom: 10px;">
-                        <strong>Винетка:</strong> ${formatDate(vehicle.vignetteStartDate)} - ${formatDate(vehicle.vignetteEndDate)}<br>
-                        <strong>Статус:</strong> ${vignetteStatus}
+                return `
+                    <p>
+                        <strong>${title}:</strong> 
+                        ${formatDate(startDate)} - ${formatDate(endDate)}<br>
+                        <strong>Статус:</strong> ${status}
+                    </p>
+                `;
+            };
+            
+            documentsContent += addDocument('Винетка', vehicle.vignetteStartDate, vehicle.vignetteEndDate);
+            documentsContent += addDocument('Преглед', vehicle.inspectionStartDate, vehicle.inspectionEndDate);
+            documentsContent += addDocument('Гражданска', vehicle.insuranceStartDate, vehicle.insuranceEndDate);
+            documentsContent += addDocument('Каско', vehicle.kaskoStartDate, vehicle.kaskoEndDate);
+            
+            if (documentsContent) {
+                printContent += `
+                    <div class="print-section">
+                        <div class="print-title">Документи</div>
+                        ${documentsContent}
                     </div>
                 `;
             }
             
-            // Inspection
-            if (vehicle.inspectionStartDate && vehicle.inspectionEndDate) {
-                const daysLeft = calculateDaysLeft(vehicle.inspectionEndDate);
-                
-                let inspectionStatus = '';
-                if (daysLeft <= 0) {
-                    inspectionStatus = `Изтекъл преди ${Math.abs(daysLeft)} дни!`;
-                } else if (daysLeft <= 30) {
-                    inspectionStatus = `Изтича след ${daysLeft} дни!`;
-                } else {
-                    inspectionStatus = `Валиден до: ${formatDate(vehicle.inspectionEndDate)}`;
-                }
-                
-                documentsHTML += `
-                    <div style="margin-bottom: 10px;">
-                        <strong>Преглед:</strong> ${formatDate(vehicle.inspectionStartDate)} - ${formatDate(vehicle.inspectionEndDate)}<br>
-                        <strong>Статус:</strong> ${inspectionStatus}
-                    </div>
-                `;
-            }
-            
-            // Insurance
-            if (vehicle.insuranceStartDate && vehicle.insuranceEndDate) {
-                const daysLeft = calculateDaysLeft(vehicle.insuranceEndDate);
-                
-                let insuranceStatus = '';
-                if (daysLeft <= 0) {
-                    insuranceStatus = `Изтекла преди ${Math.abs(daysLeft)} дни!`;
-                } else if (daysLeft <= 30) {
-                    insuranceStatus = `Изтича след ${daysLeft} дни!`;
-                } else {
-                    insuranceStatus = `Валидна до: ${formatDate(vehicle.insuranceEndDate)}`;
-                }
-                
-                documentsHTML += `
-                    <div style="margin-bottom: 10px;">
-                        <strong>Гражданска:</strong> ${formatDate(vehicle.insuranceStartDate)} - ${formatDate(vehicle.insuranceEndDate)}<br>
-                        <strong>Статус:</strong> ${insuranceStatus}
-                    </div>
-                `;
-            }
-            
-            // Kasko
-            if (vehicle.kaskoStartDate && vehicle.kaskoEndDate) {
-                const daysLeft = calculateDaysLeft(vehicle.kaskoEndDate);
-                
-                let kaskoStatus = '';
-                if (daysLeft <= 0) {
-                    kaskoStatus = `Изтекъл преди ${Math.abs(daysLeft)} дни!`;
-                } else if (daysLeft <= 30) {
-                    kaskoStatus = `Изтича след ${daysLeft} дни!`;
-                } else {
-                    kaskoStatus = `Валиден до: ${formatDate(vehicle.kaskoEndDate)}`;
-                }
-                
-                documentsHTML += `
-                    <div style="margin-bottom: 10px;">
-                        <strong>Каско:</strong> ${formatDate(vehicle.kaskoStartDate)} - ${formatDate(vehicle.kaskoEndDate)}<br>
-                        <strong>Статус:</strong> ${kaskoStatus}
-                    </div>
-                `;
-            }
-            
-            // Repairs section
-            let repairsHTML = '';
+            // Add repairs if available
             if (vehicle.repairs && vehicle.repairs.length > 0) {
-                // Separate completed and pending repairs
+                let repairsContent = '';
                 const pendingRepairs = vehicle.repairs.filter(r => !r.completed);
                 const completedRepairs = vehicle.repairs.filter(r => r.completed);
                 
                 if (pendingRepairs.length > 0) {
-                    repairsHTML += `<h4 style="font-size: 1rem; margin-bottom: 8px; color: var(--danger);">Предстоящи ремонти</h4>`;
-                    pendingRepairs.forEach((repair) => {
-                        repairsHTML += `
-                            <div style="margin-bottom: 10px; padding: 5px; border-bottom: 1px solid #eee;">
-                                <div><strong>Описание:</strong> ${repair.description}</div>
-                                ${repair.cost ? `<div><strong>Цена:</strong> ${repair.cost} лв</div>` : ''}
-                            </div>
-                        `;
-                    });
+                    repairsContent += `
+                        <div class="print-title">Предстоящи ремонти</div>
+                        ${pendingRepairs.map(repair => `
+                            <p>
+                                <strong>${repair.description}</strong><br>
+                                ${repair.cost ? `Очаквана цена: ${repair.cost} лв` : ''}
+                            </p>
+                        `).join('')}
+                    `;
                 }
                 
                 if (completedRepairs.length > 0) {
-                    repairsHTML += `<h4 style="font-size: 1rem; margin-bottom: 8px; margin-top: ${pendingRepairs.length > 0 ? '15px' : '0'}; color: var(--success);">Извършени ремонти</h4>`;
-                    completedRepairs.forEach((repair) => {
-                        repairsHTML += `
-                            <div style="margin-bottom: 10px; padding: 5px; border-bottom: 1px solid #eee;">
-                                <div><strong>Описание:</strong> ${repair.description}</div>
-                                ${repair.date ? `<div><strong>Дата:</strong> ${formatDate(repair.date)}</div>` : ''}
-                                ${repair.mileage ? `<div><strong>Километраж:</strong> ${repair.mileage} км</div>` : ''}
-                                ${repair.cost ? `<div><strong>Цена:</strong> ${repair.cost} лв</div>` : ''}
-                            </div>
-                        `;
-                    });
+                    repairsContent += `
+                        <div class="print-title">Извършени ремонти</div>
+                        ${completedRepairs.map(repair => `
+                            <p>
+                                <strong>${repair.description}</strong><br>
+                                ${repair.date ? `Дата: ${formatDate(repair.date)}` : ''}
+                                ${repair.mileage ? `Километраж: ${repair.mileage} км` : ''}
+                                ${repair.cost ? `Цена: ${repair.cost} лв` : ''}
+                            </p>
+                        `).join('')}
+                    `;
                 }
+                
+                printContent += `
+                    <div class="print-section">
+                        <div class="print-title">Ремонти</div>
+                        ${repairsContent}
+                    </div>
+                `;
             }
             
-            // Prepare print content
-            printContent.innerHTML = `
-                <div style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
-                    <h1 style="text-align: center; margin-bottom: 20px;">Информация за МПС</h1>
-                    
-                    <div style="margin-bottom: 20px;">
-                        ${vehicle.ownerName ? `<p><strong>Собственик:</strong> ${vehicle.ownerName}</p>` : ''}
-                        <p><strong>Марка и модел:</strong> ${vehicle.brand} ${vehicle.model}</p>
-                        <p><strong>Тип:</strong> ${typeText}</p>
-                        ${vehicle.licensePlate ? `<p><strong>Рег. номер:</strong> ${vehicle.licensePlate}</p>` : ''}
-                        ${vehicle.vinNumber ? `<p><strong>VIN номер:</strong> ${vehicle.vinNumber}</p>` : ''}
-                        <p><strong>Километраж:</strong> ${currentMileage} км</p>
-                        <p><strong>Последна смяна:</strong> ${lastService} км</p>
-                    </div>
-                    
-                    <div style="margin-bottom: 20px; padding: 10px; border: 1px solid #333;">
-                        <h3 style="margin-bottom: 10px;">Сервизна информация</h3>
-                        <p><strong>Статус:</strong> ${statusText}</p>
-                        <p><strong>Сервизен интервал:</strong> ${vehicle.serviceInterval} км</p>
-                        ${notifyKm > 0 ? `<p><strong>Уведомление при:</strong> ${notifyKm} км преди смяна</p>` : ''}
-                    </div>
-                    
-                    ${documentsHTML ? `
-                    <div style="margin-bottom: 20px;">
-                        <h3 style="margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px;">Документи</h3>
-                        ${documentsHTML}
-                    </div>
-                    ` : ''}
-                    
-                    ${repairsHTML ? `
-                    <div style="margin-bottom: 20px;">
-                        <h3 style="margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px;">Ремонти</h3>
-                        ${repairsHTML}
-                    </div>
-                    ` : ''}
-                    
-                    <div style="text-align: center; margin-top: 30px; font-size: 0.8em; color: #666;">
-                        Отпечатано от Автомобилен помощник на ${new Date().toLocaleDateString('bg-BG')}
-                    </div>
-                </div>
-            `;
-            
-            // Print the content
+            // Set print content and print
+            printSection.innerHTML = printContent;
             window.print();
+            
+            // Clear print section after printing
+            setTimeout(() => {
+                printSection.innerHTML = '';
+            }, 1000);
         }
         
         // Add new vehicle
