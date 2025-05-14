@@ -50,6 +50,11 @@
             padding: 10px;
         }
         
+        .logo {
+            max-height: 80px;
+            margin-bottom: 10px;
+        }
+        
         h1 {
             color: var(--primary);
             margin-bottom: 5px;
@@ -122,6 +127,10 @@
         
         .btn-kasko {
             background: var(--kasko);
+        }
+        
+        .btn-help {
+            background: #6c757d;
         }
         
         .alert {
@@ -360,14 +369,25 @@
             border-top: 1px solid #ddd;
         }
         
-        .upcoming-repair-input {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 8px;
+        .help-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid var(--info);
         }
         
-        .upcoming-repair-input input {
-            flex: 1;
+        .help-section h3 {
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+        
+        .help-section ul {
+            padding-left: 20px;
+        }
+        
+        .help-section li {
+            margin-bottom: 8px;
         }
         
         @media (min-width: 768px) {
@@ -406,6 +426,7 @@
 <body>
     <div class="container">
         <header>
+            <img src="https://raw.githubusercontent.com/Bpavlov321456/snimki/refs/heads/main/FA949ED9-AF4C-4E6F-960D-E108C80333AF.png" alt="Автомобилен помощник" class="logo">
             <h1>Автомобилен помощник</h1>
             <p style="font-size: 0.9rem;">Проследяване на сервизни интервали, документи и ремонти за вашето МПС</p>
         </header>
@@ -413,6 +434,7 @@
         <div class="tab-buttons">
             <button class="tab-btn active" onclick="openTab('manage')">Вашите МПС</button>
             <button class="tab-btn" onclick="openTab('add')">Добави ново МПС</button>
+            <button class="tab-btn" onclick="openTab('help')">Помощ</button>
         </div>
         
         <div id="manage" class="tab-content active">
@@ -510,13 +532,68 @@
                     <input type="date" id="kaskoEndDate">
                 </div>
                 
-                <h3 style="margin-top: 15px; font-size: 1.1rem;">Предстоящи ремонти (по избор)</h3>
-                <div id="upcomingRepairsContainer">
-                    <!-- Предстоящите ремонти ще се добавят тук -->
-                </div>
-                <button type="button" class="btn-repair" onclick="addUpcomingRepairField()" style="margin-top: 10px;">Добави предстоящ ремонт</button>
-                
                 <button id="addVehicleBtn" class="btn-success" style="margin-top: 20px;">Добави МПС</button>
+            </div>
+        </div>
+        
+        <div id="help" class="tab-content">
+            <div class="card">
+                <h2 style="font-size: 1.2rem; margin-bottom: 10px;">Как да използвате автомобилния помощник</h2>
+                
+                <div class="help-section">
+                    <h3>Добавяне на ново МПС</h3>
+                    <ul>
+                        <li>Изберете "Добави ново МПС" от горното меню</li>
+                        <li>Попълнете задължителните полета: марка, модел, сервизен интервал и начален километраж</li>
+                        <li>По желание добавете допълнителна информация като VIN номер, регистрационен номер и документи</li>
+                        <li>Натиснете бутона "Добави МПС" за да запазите информацията</li>
+                    </ul>
+                </div>
+                
+                <div class="help-section">
+                    <h3>Управление на МПС</h3>
+                    <ul>
+                        <li>Всички ваши МПС-та се показват в раздела "Вашите МПС"</li>
+                        <li>Можете да търсите по име на собственик или модел с помощта на търсачката</li>
+                        <li>За всяко МПС можете да:
+                            <ul>
+                                <li>Обновявате километража</li>
+                                <li>Записвате сервизни смени</li>
+                                <li>Добавяте ремонти (извършени или предстоящи)</li>
+                                <li>Обновявате сроковете на документи</li>
+                                <li>Изтривате МПС от системата</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="help-section">
+                    <h3>Сервизни интервали</h3>
+                    <ul>
+                        <li>Системата автоматично ще ви уведомява кога наближава време за сервиз</li>
+                        <li>Можете да зададете колко километра преди сервиза да получите уведомление</li>
+                        <li>При достигане на сервизния интервал, МПС-то ще се маркира в червено</li>
+                    </ul>
+                </div>
+                
+                <div class="help-section">
+                    <h3>Документи</h3>
+                    <ul>
+                        <li>Можете да добавяте срокове на важни документи: винетка, преглед, гражданска и каско застраховка</li>
+                        <li>Системата ще ви предупреждава когато срокът на документ изтича</li>
+                        <li>При достигане на крайната дата, документът ще се маркира в червено</li>
+                    </ul>
+                </div>
+                
+                <div class="help-section">
+                    <h3>Ремонти</h3>
+                    <ul>
+                        <li>Можете да записвате както извършени, така и предстоящи ремонти</li>
+                        <li>За извършените ремонти можете да добавяте дата, километраж и цена</li>
+                        <li>Предстоящите ремонти могат да бъдат маркирани като завършени</li>
+                        <li>Всички ремонти се запазват в историята на МПС-то</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
@@ -578,7 +655,6 @@
         const repairModal = document.getElementById('repairModal');
         const saveRepairBtn = document.getElementById('saveRepairBtn');
         const searchInput = document.getElementById('searchInput');
-        const upcomingRepairsContainer = document.getElementById('upcomingRepairsContainer');
         const upcomingRepairModal = document.getElementById('upcomingRepairModal');
         const currentYearElement = document.getElementById('currentYear');
         
@@ -587,7 +663,6 @@
         let currentRepairIndex = null;
         let isEditingRepair = false;
         let allVehicles = [];
-        let upcomingRepairCounter = 0;
         
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
@@ -649,18 +724,6 @@
             });
             
             renderVehicles(filteredVehicles);
-        }
-        
-        // Add field for upcoming repair in add vehicle form
-        function addUpcomingRepairField() {
-            const repairId = 'upcomingRepair-' + upcomingRepairCounter++;
-            const repairField = document.createElement('div');
-            repairField.className = 'upcoming-repair-input';
-            repairField.innerHTML = `
-                <input type="text" id="${repairId}" placeholder="Описание на предстоящ ремонт">
-                <button class="btn-danger" onclick="this.parentElement.remove()" style="padding: 5px 8px;">✕</button>
-            `;
-            upcomingRepairsContainer.appendChild(repairField);
         }
         
         // Open modal for adding upcoming repair to existing vehicle
@@ -990,18 +1053,6 @@
             const kaskoStartDate = document.getElementById('kaskoStartDate').value;
             const kaskoEndDate = document.getElementById('kaskoEndDate').value;
             
-            // Get upcoming repairs
-            const upcomingRepairs = [];
-            const upcomingRepairInputs = upcomingRepairsContainer.querySelectorAll('input[type="text"]');
-            upcomingRepairInputs.forEach(input => {
-                if (input.value.trim()) {
-                    upcomingRepairs.push({
-                        description: input.value.trim(),
-                        completed: false
-                    });
-                }
-            });
-            
             // Validation
             if (!brand || !model) {
                 showAlert('Моля, въведете марка и модел!', 'danger');
@@ -1054,7 +1105,7 @@
                 currentMileage: initialMileage,
                 lastServiceMileage: initialMileage,
                 history: [],
-                repairs: upcomingRepairs
+                repairs: []
             };
             
             // Add documents if provided
@@ -1099,10 +1150,6 @@
             document.getElementById('insuranceEndDate').value = '';
             document.getElementById('kaskoStartDate').value = '';
             document.getElementById('kaskoEndDate').value = '';
-            
-            // Clear upcoming repairs
-            upcomingRepairsContainer.innerHTML = '';
-            upcomingRepairCounter = 0;
             
             showAlert('МПС-то е добавено успешно!', 'success');
             loadVehicles();
