@@ -6,20 +6,6 @@
     <title>Автомобилен помощник - сервиз и документи за вашето МПС</title>
     <meta name="description" content="Лесно проследяване на сервизни интервали, винетки, прегледи, гражданска отговорност и ремонти за вашите превозни средства">
     
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://yourwebsite.com/">
-    <meta property="og:title" content="Автомобилен помощник - сервиз и документи">
-    <meta property="og:description" content="Проследявайте сервизните интервали, документи и ремонти за вашето МПС">
-    <meta property="og:image" content="https://yourwebsite.com/image.jpg">
-
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://yourwebsite.com/">
-    <meta property="twitter:title" content="Автомобилен помощник - сервиз и документи">
-    <meta property="twitter:description" content="Проследявайте сервизните интервали, документи и ремонти за вашето МПС">
-    <meta property="twitter:image" content="https://yourwebsite.com/image.jpg">
-
     <style>
         :root {
             --primary: #2c3e50;
@@ -31,6 +17,7 @@
             --dark: #2c3e50;
             --info: #17a2b8;
             --repair: #8e44ad;
+            --kasko: #ff6b6b;
         }
         
         * {
@@ -131,6 +118,10 @@
             background: var(--repair);
         }
         
+        .btn-kasko {
+            background: var(--kasko);
+        }
+        
         .alert {
             padding: 10px;
             border-radius: 4px;
@@ -161,6 +152,11 @@
         .alert-repair {
             background: #e8d6f2;
             border-left: 4px solid var(--repair);
+        }
+        
+        .alert-kasko {
+            background: #ffd6d6;
+            border-left: 4px solid var(--kasko);
         }
         
         .status-box {
@@ -214,6 +210,10 @@
         
         .insurance-badge {
             background: #6f42c1;
+        }
+        
+        .kasko-badge {
+            background: var(--kasko);
         }
         
         .repair-badge {
@@ -322,6 +322,29 @@
             color: #555;
         }
         
+        .search-container {
+            margin-bottom: 15px;
+        }
+        
+        .search-input {
+            padding: 8px 15px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .owner-badge {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .vin-badge {
+            background: #343a40;
+            color: white;
+        }
+        
         @media (min-width: 768px) {
             .container {
                 padding: 15px;
@@ -369,6 +392,9 @@
         
         <div id="manage" class="tab-content active">
             <div class="card">
+                <div class="search-container">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Търсене по име на собственик или модел..." oninput="searchVehicles()">
+                </div>
                 <h2 style="font-size: 1.2rem; margin-bottom: 10px;">Вашите превозни средства</h2>
                 <div id="vehiclesContainer" class="vehicles-list">
                     <!-- МПС-тата ще се показват тук -->
@@ -379,6 +405,10 @@
         <div id="add" class="tab-content">
             <div class="card">
                 <h2 style="font-size: 1.2rem; margin-bottom: 10px;">Добавяне на ново МПС</h2>
+                <div class="form-group">
+                    <label for="ownerName">Име на собственик</label>
+                    <input type="text" id="ownerName" placeholder="Например: Иван Иванов">
+                </div>
                 <div class="form-group">
                     <label for="vehicleType">Тип МПС</label>
                     <select id="vehicleType" class="form-control">
@@ -399,6 +429,10 @@
                 <div class="form-group">
                     <label for="licensePlate">Регистрационен номер</label>
                     <input type="text" id="licensePlate" placeholder="Например: СА1234ВС">
+                </div>
+                <div class="form-group">
+                    <label for="vinNumber">VIN номер (по избор)</label>
+                    <input type="text" id="vinNumber" placeholder="Например: WVWZZZ1JZ3W386752">
                 </div>
                 <div class="form-group">
                     <label for="serviceInterval">Сервизен интервал (км)</label>
@@ -442,7 +476,22 @@
                     <input type="date" id="insuranceEndDate">
                 </div>
                 
-                <button id="addVehicleBtn" class="btn-success">Добави МПС</button>
+                <div class="form-group">
+                    <label for="kaskoStartDate">Каско - начална дата</label>
+                    <input type="date" id="kaskoStartDate">
+                </div>
+                <div class="form-group">
+                    <label for="kaskoEndDate">Каско - крайна дата</label>
+                    <input type="date" id="kaskoEndDate">
+                </div>
+                
+                <h3 style="margin-top: 15px; font-size: 1.1rem;">Предстоящи ремонти (по избор)</h3>
+                <div id="upcomingRepairsContainer">
+                    <!-- Предстоящите ремонти ще се добавят тук -->
+                </div>
+                <button type="button" class="btn-repair" onclick="addUpcomingRepairField()" style="margin-top: 10px;">Добави предстоящ ремонт</button>
+                
+                <button id="addVehicleBtn" class="btn-success" style="margin-top: 20px;">Добави МПС</button>
             </div>
         </div>
     </div>
@@ -480,11 +529,15 @@
         const addVehicleBtn = document.getElementById('addVehicleBtn');
         const repairModal = document.getElementById('repairModal');
         const saveRepairBtn = document.getElementById('saveRepairBtn');
+        const searchInput = document.getElementById('searchInput');
+        const upcomingRepairsContainer = document.getElementById('upcomingRepairsContainer');
         
         // Global variables
         let currentVehicleIndex = null;
         let currentRepairIndex = null;
         let isEditingRepair = false;
+        let allVehicles = [];
+        let upcomingRepairCounter = 0;
         
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
@@ -528,12 +581,47 @@
             return Math.ceil((end - today) / (1000 * 60 * 60 * 24));
         }
         
+        // Search vehicles by owner name or model
+        function searchVehicles() {
+            const searchTerm = searchInput.value.toLowerCase();
+            if (searchTerm === '') {
+                renderVehicles(allVehicles);
+                return;
+            }
+            
+            const filteredVehicles = allVehicles.filter(vehicle => {
+                const ownerMatch = vehicle.ownerName && vehicle.ownerName.toLowerCase().includes(searchTerm);
+                const modelMatch = vehicle.model && vehicle.model.toLowerCase().includes(searchTerm);
+                return ownerMatch || modelMatch;
+            });
+            
+            renderVehicles(filteredVehicles);
+        }
+        
+        // Add field for upcoming repair
+        function addUpcomingRepairField() {
+            const repairId = 'upcomingRepair-' + upcomingRepairCounter++;
+            const repairField = document.createElement('div');
+            repairField.className = 'form-group';
+            repairField.innerHTML = `
+                <div style="display: flex; gap: 5px; align-items: center;">
+                    <input type="text" id="${repairId}" placeholder="Описание на предстоящ ремонт" style="flex: 1;">
+                    <button class="btn-danger" onclick="this.parentElement.parentElement.remove()" style="padding: 5px 8px;">✕</button>
+                </div>
+            `;
+            upcomingRepairsContainer.appendChild(repairField);
+        }
+        
         // Load all vehicles
         function loadVehicles() {
-            const vehicles = JSON.parse(localStorage.getItem('vehicles')) || [];
-            
+            allVehicles = JSON.parse(localStorage.getItem('vehicles')) || [];
+            renderVehicles(allVehicles);
+        }
+        
+        // Render vehicles to the UI
+        function renderVehicles(vehicles) {
             if (vehicles.length === 0) {
-                vehiclesContainer.innerHTML = '<p style="text-align: center;">Нямате добавени МПС. Моля, добавете първото.</p>';
+                vehiclesContainer.innerHTML = '<p style="text-align: center;">Няма намерени МПС.</p>';
                 return;
             }
             
@@ -650,6 +738,29 @@
                     `;
                 }
                 
+                // Kasko
+                if (vehicle.kaskoStartDate && vehicle.kaskoEndDate) {
+                    const daysLeft = calculateDaysLeft(vehicle.kaskoEndDate);
+                    
+                    let kaskoStatus = '';
+                    if (daysLeft <= 0) {
+                        kaskoStatus = `<span class="warning">Изтекъл преди ${Math.abs(daysLeft)} дни!</span>`;
+                    } else if (daysLeft <= 30) {
+                        kaskoStatus = `<span class="warning">Изтича след ${daysLeft} дни!</span>`;
+                    } else {
+                        kaskoStatus = `Валиден до: ${formatDate(vehicle.kaskoEndDate)}`;
+                    }
+                    
+                    documentsHTML += `
+                        <div class="document-item">
+                            <strong><span class="badge kasko-badge">Каско</span></strong>
+                            <div>${formatDate(vehicle.kaskoStartDate)} - ${formatDate(vehicle.kaskoEndDate)}</div>
+                            <div>${kaskoStatus}</div>
+                            <button class="btn-kasko" style="margin-top: 5px;" onclick="updateDocumentDates(${index}, 'kasko')">Обнови</button>
+                        </div>
+                    `;
+                }
+                
                 // Repairs section
                 let repairsHTML = '';
                 if (vehicle.repairs && vehicle.repairs.length > 0) {
@@ -706,9 +817,11 @@
                 }
                 
                 vehicleCard.innerHTML = `
+                    ${vehicle.ownerName ? `<p><strong><span class="badge owner-badge">Собственик</span> ${vehicle.ownerName}</strong></p>` : ''}
                     <h3>${vehicle.brand} ${vehicle.model}</h3>
                     <p><strong>Тип:</strong> ${typeText}</p>
                     ${vehicle.licensePlate ? `<p><strong>Рег. номер:</strong> ${vehicle.licensePlate}</p>` : ''}
+                    ${vehicle.vinNumber ? `<p><strong><span class="badge vin-badge">VIN</span> ${vehicle.vinNumber}</p>` : ''}
                     <p><strong>Километраж:</strong> ${currentMileage} км</p>
                     <p><strong>Последна смяна:</strong> ${lastService} км</p>
                     
@@ -762,10 +875,12 @@
         
         // Add new vehicle
         function addNewVehicle() {
+            const ownerName = document.getElementById('ownerName').value.trim();
             const type = document.getElementById('vehicleType').value;
             const brand = document.getElementById('vehicleBrand').value.trim();
             const model = document.getElementById('vehicleModel').value.trim();
             const licensePlate = document.getElementById('licensePlate').value.trim();
+            const vinNumber = document.getElementById('vinNumber').value.trim();
             const interval = parseInt(document.getElementById('serviceInterval').value);
             const notifyKm = parseInt(document.getElementById('notificationKm').value) || 0;
             const initialMileage = parseInt(document.getElementById('initialMileage').value);
@@ -777,6 +892,20 @@
             const inspectionEndDate = document.getElementById('inspectionEndDate').value;
             const insuranceStartDate = document.getElementById('insuranceStartDate').value;
             const insuranceEndDate = document.getElementById('insuranceEndDate').value;
+            const kaskoStartDate = document.getElementById('kaskoStartDate').value;
+            const kaskoEndDate = document.getElementById('kaskoEndDate').value;
+            
+            // Get upcoming repairs
+            const upcomingRepairs = [];
+            const upcomingRepairInputs = upcomingRepairsContainer.querySelectorAll('input[type="text"]');
+            upcomingRepairInputs.forEach(input => {
+                if (input.value.trim()) {
+                    upcomingRepairs.push({
+                        description: input.value.trim(),
+                        completed: false
+                    });
+                }
+            });
             
             // Validation
             if (!brand || !model) {
@@ -810,20 +939,27 @@
                 return;
             }
             
+            if ((kaskoStartDate && !kaskoEndDate) || (!kaskoStartDate && kaskoEndDate)) {
+                showAlert('Моля, въведете и двете дати за каското или оставете и двете празни!', 'danger');
+                return;
+            }
+            
             const vehicles = JSON.parse(localStorage.getItem('vehicles')) || [];
             
             const newVehicle = {
+                ownerName: ownerName,
                 type: type,
                 brand: brand,
                 model: model,
                 licensePlate: licensePlate,
+                vinNumber: vinNumber || null,
                 serviceInterval: interval,
                 notificationKm: notifyKm,
                 initialMileage: initialMileage,
                 currentMileage: initialMileage,
                 lastServiceMileage: initialMileage,
                 history: [],
-                repairs: []
+                repairs: upcomingRepairs
             };
             
             // Add documents if provided
@@ -842,14 +978,21 @@
                 newVehicle.insuranceEndDate = insuranceEndDate;
             }
             
+            if (kaskoStartDate && kaskoEndDate) {
+                newVehicle.kaskoStartDate = kaskoStartDate;
+                newVehicle.kaskoEndDate = kaskoEndDate;
+            }
+            
             vehicles.push(newVehicle);
             
             localStorage.setItem('vehicles', JSON.stringify(vehicles));
             
             // Clear form
+            document.getElementById('ownerName').value = '';
             document.getElementById('vehicleBrand').value = '';
             document.getElementById('vehicleModel').value = '';
             document.getElementById('licensePlate').value = '';
+            document.getElementById('vinNumber').value = '';
             document.getElementById('serviceInterval').value = '';
             document.getElementById('notificationKm').value = '';
             document.getElementById('initialMileage').value = '';
@@ -859,6 +1002,12 @@
             document.getElementById('inspectionEndDate').value = '';
             document.getElementById('insuranceStartDate').value = '';
             document.getElementById('insuranceEndDate').value = '';
+            document.getElementById('kaskoStartDate').value = '';
+            document.getElementById('kaskoEndDate').value = '';
+            
+            // Clear upcoming repairs
+            upcomingRepairsContainer.innerHTML = '';
+            upcomingRepairCounter = 0;
             
             showAlert('МПС-то е добавено успешно!', 'success');
             loadVehicles();
@@ -919,6 +1068,7 @@
                 case 'vignette': return 'винетка';
                 case 'inspection': return 'преглед';
                 case 'insurance': return 'гражданска';
+                case 'kasko': return 'каско';
                 default: return 'документ';
             }
         }
