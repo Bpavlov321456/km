@@ -1073,7 +1073,7 @@
                             <input type="date" id="newDocEndDate-${index}" style="margin-bottom: 8px; width: 100%;">
                         </div>
                         <div style="display: flex; gap: 5px;">
-                            <button onclick="saveDocumentDates(${index})">Запази</button>
+                            <button onclick="saveDocumentDates(${index}, '${currentDocType}')">Запази</button>
                             <button class="btn-danger" onclick="closeDocForm(${index})">Откажи</button>
                         </div>
                     </div>
@@ -1111,35 +1111,45 @@
                 statusText = `Оставащи км: ${kmLeft}`;
             }
             
-            // Prepare print content
+            // Create print content
             let printContent = `
-                <div class="print-header">
+                <html>
+                <head>
+                    <title>Информация за МПС</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; }
+                        h1 { color: #2c3e50; text-align: center; }
+                        .section { margin-bottom: 20px; }
+                        .section-title { font-weight: bold; border-bottom: 1px solid #ddd; padding-bottom: 5px; margin-bottom: 10px; }
+                        .warning { color: red; font-weight: bold; }
+                        @page { size: auto; margin: 10mm; }
+                    </style>
+                </head>
+                <body>
                     <h1>Информация за МПС</h1>
-                    <p>Отпечатано на ${new Date().toLocaleDateString('bg-BG')}</p>
-                </div>
-                
-                <div class="print-section">
-                    <div class="print-title">Основни данни</div>
-                    ${vehicle.ownerName ? `<p><strong>Собственик:</strong> ${vehicle.ownerName}</p>` : ''}
-                    <p><strong>Марка и модел:</strong> ${vehicle.brand} ${vehicle.model}</p>
-                    <p><strong>Тип:</strong> ${typeText}</p>
-                    ${vehicle.licensePlate ? `<p><strong>Рег. номер:</strong> ${vehicle.licensePlate}</p>` : ''}
-                    ${vehicle.vinNumber ? `<p><strong>VIN номер:</strong> ${vehicle.vinNumber}</p>` : ''}
-                    <p><strong>Километраж:</strong> ${currentMileage} км</p>
-                    <p><strong>Последна смяна:</strong> ${lastService} км</p>
-                </div>
-                
-                <div class="print-section">
-                    <div class="print-title">Сервизна информация</div>
-                    <p><strong>Статус:</strong> ${statusText}</p>
-                    <p><strong>Сервизен интервал:</strong> ${vehicle.serviceInterval} км</p>
-                    ${vehicle.notificationKm ? `<p><strong>Уведомление при:</strong> ${vehicle.notificationKm} км преди смяна</p>` : ''}
-                </div>
+                    <p style="text-align: center;">Отпечатано на ${new Date().toLocaleDateString('bg-BG')}</p>
+                    
+                    <div class="section">
+                        <div class="section-title">Основни данни</div>
+                        ${vehicle.ownerName ? `<p><strong>Собственик:</strong> ${vehicle.ownerName}</p>` : ''}
+                        <p><strong>Марка и модел:</strong> ${vehicle.brand} ${vehicle.model}</p>
+                        <p><strong>Тип:</strong> ${typeText}</p>
+                        ${vehicle.licensePlate ? `<p><strong>Рег. номер:</strong> ${vehicle.licensePlate}</p>` : ''}
+                        ${vehicle.vinNumber ? `<p><strong>VIN номер:</strong> ${vehicle.vinNumber}</p>` : ''}
+                        <p><strong>Километраж:</strong> ${currentMileage} км</p>
+                        <p><strong>Последна смяна:</strong> ${lastService} км</p>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">Сервизна информация</div>
+                        <p><strong>Статус:</strong> ${statusText}</p>
+                        <p><strong>Сервизен интервал:</strong> ${vehicle.serviceInterval} км</p>
+                        ${vehicle.notificationKm ? `<p><strong>Уведомление при:</strong> ${vehicle.notificationKm} км преди смяна</p>` : ''}
+                    </div>
             `;
             
             // Add documents if available
-            let documentsContent = '';
-            const addDocument = (title, startDate, endDate) => {
+            const addDocumentSection = (title, startDate, endDate) => {
                 if (!startDate || !endDate) return '';
                 
                 const daysLeft = calculateDaysLeft(endDate);
@@ -1161,15 +1171,16 @@
                 `;
             };
             
-            documentsContent += addDocument('Винетка', vehicle.vignetteStartDate, vehicle.vignetteEndDate);
-            documentsContent += addDocument('Преглед', vehicle.inspectionStartDate, vehicle.inspectionEndDate);
-            documentsContent += addDocument('Гражданска', vehicle.insuranceStartDate, vehicle.insuranceEndDate);
-            documentsContent += addDocument('Каско', vehicle.kaskoStartDate, vehicle.kaskoEndDate);
+            let documentsContent = '';
+            documentsContent += addDocumentSection('Винетка', vehicle.vignetteStartDate, vehicle.vignetteEndDate);
+            documentsContent += addDocumentSection('Преглед', vehicle.inspectionStartDate, vehicle.inspectionEndDate);
+            documentsContent += addDocumentSection('Гражданска', vehicle.insuranceStartDate, vehicle.insuranceEndDate);
+            documentsContent += addDocumentSection('Каско', vehicle.kaskoStartDate, vehicle.kaskoEndDate);
             
             if (documentsContent) {
                 printContent += `
-                    <div class="print-section">
-                        <div class="print-title">Документи</div>
+                    <div class="section">
+                        <div class="section-title">Документи</div>
                         ${documentsContent}
                     </div>
                 `;
@@ -1183,7 +1194,7 @@
                 
                 if (pendingRepairs.length > 0) {
                     repairsContent += `
-                        <div class="print-title">Предстоящи ремонти</div>
+                        <div class="section-title">Предстоящи ремонти</div>
                         ${pendingRepairs.map(repair => `
                             <p>
                                 <strong>${repair.description}</strong><br>
@@ -1195,7 +1206,7 @@
                 
                 if (completedRepairs.length > 0) {
                     repairsContent += `
-                        <div class="print-title">Извършени ремонти</div>
+                        <div class="section-title">Извършени ремонти</div>
                         ${completedRepairs.map(repair => `
                             <p>
                                 <strong>${repair.description}</strong><br>
@@ -1208,21 +1219,25 @@
                 }
                 
                 printContent += `
-                    <div class="print-section">
-                        <div class="print-title">Ремонти</div>
+                    <div class="section">
                         ${repairsContent}
                     </div>
                 `;
             }
             
-            // Set print content and print
-            printSection.innerHTML = printContent;
-            window.print();
+            printContent += `</body></html>`;
             
-            // Clear print section after printing
+            // Open print window
+            const printWindow = window.open('', '_blank');
+            printWindow.document.open();
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            
+            // Wait for content to load before printing
             setTimeout(() => {
-                printSection.innerHTML = '';
-            }, 1000);
+                printWindow.print();
+                printWindow.close();
+            }, 500);
         }
         
         // Add new vehicle
